@@ -1,0 +1,43 @@
+services:
+  app:
+    build:
+      context: ./fpm
+      dockerfile: Dockerfile
+    image: module58/fpm
+    volumes:
+      - ./code:/var/www/html/webchat.local
+    networks:
+      - module58-network
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    image: module58/nginx
+    volumes:
+      - ./code:/var/www/html/webchat.local
+      - ./nginx/conf:/etc/nginx/conf.d
+    ports:
+      - "80:80"
+      - "443:443"
+    command: [nginx-debug, '-g', 'daemon off;']
+    networks:
+      - module58-network
+
+  mysql:
+    image: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - ./dbdata:/var/lib/mysql
+    networks:
+      - module58-network
+
+networks:
+  module58-network:
+    driver: bridge
