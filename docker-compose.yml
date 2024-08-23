@@ -38,6 +38,16 @@ services:
     networks:
       - module58-network
 
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      - mysql
+    networks:
+      - module58-network
+
 networks:
   module58-network:
     driver: bridge
