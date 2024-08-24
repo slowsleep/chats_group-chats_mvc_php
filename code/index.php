@@ -1,3 +1,3 @@
 <?php
 
-echo "hello everybody";
+require_once 'app/bootstrap.php';
