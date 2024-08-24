@@ -1,8 +1,12 @@
 <?php
 
-require_once __DIR__ . '/../database/DB.php';
+namespace App\Tools;
 
-function createTableUsers() {
+use App\Database\DB;
+use PDOException;
+
+function createTableUsers()
+{
     try {
         $db = DB::connect();
 
@@ -18,14 +22,15 @@ function createTableUsers() {
 
         $db->exec($query);
 
-        echo "Table users created successfully" . PHP_EOL;
+        echo "Table users created successfully.<br>";
     } catch (PDOException $e) {
         echo $e->getMessage();
     }
 }
 
 
-function createTableChats() {
+function createTableChats()
+{
     try {
         $db = DB::connect();
 
@@ -39,13 +44,14 @@ function createTableChats() {
 
         $db->exec($query);
 
-        echo "Table chats created successfully" . PHP_EOL;
+        echo "Table chats created successfully.<br>";
     } catch (PDOException $e) {
         echo $e->getMessage();
     }
 }
 
-function createTableMessages() {
+function createTableMessages()
+{
     try {
         $db = DB::connect();
 
@@ -61,13 +67,14 @@ function createTableMessages() {
 
         $db->exec($query);
 
-        echo "Table messages created successfully" . PHP_EOL;
+        echo "Table messages created successfully.<br>";
     } catch (PDOException $e) {
         echo $e->getMessage();
     }
 }
 
-function createTableChatMembers() {
+function createTableChatMembers()
+{
     try {
         $db = DB::connect();
 
@@ -79,13 +86,14 @@ function createTableChatMembers() {
 
         $db->exec($query);
 
-        echo "Table chat_members created successfully" . PHP_EOL;
+        echo "Table chat_members created successfully.<br>";
     } catch (PDOException $e) {
         echo $e->getMessage();
     }
 }
 
-function createTableChatMessages() {
+function createTableChatMessages()
+{
     try {
         $db = DB::connect();
 
@@ -96,15 +104,17 @@ function createTableChatMessages() {
 
         $db->exec($query);
 
-        echo "Table chat_messages created successfully" . PHP_EOL;
+        echo "Table chat_messages created successfully.<br>";
     } catch (PDOException $e) {
         echo $e->getMessage();
     }
 }
 
-
-createTableUsers();
-createTableChats();
-createTableMessages();
-createTableChatMembers();
-createTableChatMessages();
+function createAllTables()
+{
+    createTableUsers();
+    createTableChats();
+    createTableMessages();
+    createTableChatMembers();
+    createTableChatMessages();
+}
