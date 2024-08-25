@@ -55,3 +55,37 @@ main {
     cursor: pointer;
     text-decoration: underline;
 }
+
+.form-registration, .form-login {
+    display: flex;
+    flex-direction: column;
+    gap: .5em;
+}
+
+.form-registration__row, .form-login__row {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+
+}
+
+.form-registration__row > label, .form-login__row > label {
+    width: 30%;
+    cursor: pointer;
+}
+
+.form-registration__row > input, .form-login__row > input {
+    width: 70%;
+}
+
+input {
+    padding: .5em;
+    border-radius: .5em;
+    border: 1px solid #C4C4C4;
+}
+
+input:hover {
+    cursor: pointer;
+    border: 1px solid #000;
+}
+

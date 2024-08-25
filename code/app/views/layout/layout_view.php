@@ -31,6 +31,12 @@
                 <li class="side-menu__list__item">Создать группу</li>
                 <li class="side-menu__list__item">Выйти</li>
             </ul>
+            <ul>
+                <li>
+                    <a href="login">Войти</a>
+                    <a href="registration">Зарегестрироваться</a>
+                </li>
+            </ul>
         </div>
     </main>
 </body>
