@@ -14,12 +14,17 @@ class RegistrationController extends Controller
 
     public function register()
     {
-        $user = User::create($_POST);
-
-        if ($user) {
-            $this->view->render(['content_view' => 'registration_view.php', 'data' => 'Регистрация прошла успешно!']);
+        $errors = [];
+        if (User::checkUsernameExists($_POST['username'])) {
+            $errors['username'] = 'Пользователь с таким именем уже существует!';
         } else {
-            $this->view->render(['content_view' => 'registration_view.php', 'data' => 'Регистрация не прошла!']);
+            $user = User::create($_POST);
+        }
+
+        if (isset($user) && $user) {
+            $this->view->render(['content_view' => 'registration_view.php', 'data' => ['message' => 'Регистрация прошла успешно!']]);
+        } else {
+            $this->view->render(['content_view' => 'registration_view.php', 'data' => ['message' => 'Регистрация не прошла!', 'errors' => $errors]]);
         }
     }
 }
