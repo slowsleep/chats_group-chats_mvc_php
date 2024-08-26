@@ -1,27 +1,32 @@
-<form class="form-registration" method="post">
+<h1>Регистрация</h1>
+<form class="form-registration" method="post" action="registration/register">
     <div class="form-registration__row">
         <label for="reg-username">
             Username:
         </label>
-        <input type="text" name="username" id="reg-username">
+        <input type="text" name="username" id="reg-username" required>
     </div>
     <div class="form-registration__row">
         <label for="reg-email">
             Email:
         </label>
-        <input type="email" name="email" id="reg-email">
+        <input type="email" name="email" id="reg-email" required>
     </div>
     <div class="form-registration__row">
         <label for="reg-password">
             Пароль:
         </label>
-        <input type="password" name="password" id="reg-password">
+        <input type="password" name="password" id="reg-password" required>
     </div>
     <div class="form-registration__row">
         <label for="reg-password-repeat">
             Повтор пароля:
         </label>
-        <input type="password" name="password-repeat" id="reg-password-repeat">
+        <input type="password" name="password-repeat" id="reg-password-repeat" required>
     </div>
     <input type="submit" value="Зарегестрироваться">
 </form>
+
+<?php echo $data; ?>
+
+<script src="/app/assets/js/checkRegistrationFields.js"></script>
