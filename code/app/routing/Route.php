@@ -45,7 +45,7 @@ class Route
     {
         header('HTTP/1.1 404 Not Found');
         $view = new View();
-        $view->render('notFound_view.php');
+        $view->render(['content_view' => 'notFound_view.php']);
         exit;
     }
 }
