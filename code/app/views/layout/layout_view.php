@@ -10,33 +10,40 @@
 
 <body>
     <main>
-        <div class="chat-list">
-            <div class="chat-list__dialogs">
-                <p>1</p>
+        <?php if (isset($_SESSION['user']) && $_SESSION['user']) : ?>
+            <div class="chat-list">
+                <div class="chat-list__dialogs">
+                    <p>1</p>
+                </div>
+                <hr>
+                <div class="chat-list__groups">
+                    <p>2</p>
+                </div>
             </div>
             <hr>
-            <div class="chat-list__groups">
-                <p>2</p>
-            </div>
-        </div>
-        <hr>
+        <?php endif; ?>
         <div class="content">
             <?php include_once APP_DIR . '/views/' . $content_view; ?>
         </div>
         <hr>
         <div class="side-menu">
+            <?php if (isset($_SESSION['user']) && $_SESSION['user']) : ?>
             <ul class="side-menu__list">
                 <li class="side-menu__list__item">Профиль</li>
                 <li class="side-menu__list__item">Настройки</li>
                 <li class="side-menu__list__item">Создать группу</li>
-                <li class="side-menu__list__item">Выйти</li>
+                <li class="side-menu__list__item"><a href="/logout">Выйти</a></li>
             </ul>
-            <ul>
-                <li>
-                    <a href="login">Войти</a>
-                    <a href="registration">Зарегестрироваться</a>
+            <?php else : ?>
+            <ul class="side-menu__list">
+                <li class="side-menu__list__item">
+                    <a href="/login">Войти</a>
+                </li>
+                <li class="side-menu__list__item">
+                    <a href="/registration">Зарегестрироваться</a>
                 </li>
             </ul>
+            <?php endif; ?>
         </div>
     </main>
 </body>
