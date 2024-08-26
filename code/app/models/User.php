@@ -50,4 +50,28 @@ class User extends Model
         }
         return false;
     }
+
+    public static function login($email, $password)
+    {
+        try {
+            $db = DB::connect();
+            $query = 'SELECT * FROM users WHERE email = :email';
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':email', $email);
+            $stmt->execute();
+            if ($stmt->rowCount() > 0) {
+                $user = $stmt->fetch();
+                if (password_verify($password . SALT, $user['password'])) {
+                    $user = [
+                        'username'=> $user['username'],
+                        'email'=> $user['email'],
+                    ];
+                    return $user;
+                }
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return false;
+    }
 }
