@@ -14,7 +14,7 @@ class DB
     {
         if (!isset(DB::$connection)) {
             try {
-                DB::$connection = new PDO('mysql:host=mysql;dbname=' . DB_NAME, DB_USER, DB_PASS);
+                DB::$connection = new PDO('mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, DB_USER, DB_PASS);
             } catch (PDOException $e) {
                 // TODO: print to error log
                 echo 'Connection failed: ' . $e->getMessage() . PHP_EOL;
