@@ -33,4 +33,21 @@ class User extends Model
         }
         return false;
     }
+
+    public static function checkUsernameExists($username)
+    {
+        try {
+            $db = DB::connect();
+            $query = 'SELECT username FROM users WHERE username = :username';
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':username', $username);
+            $stmt->execute();
+            if ($stmt->rowCount() > 0) {
+                return true;
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return false;
+    }
 }
