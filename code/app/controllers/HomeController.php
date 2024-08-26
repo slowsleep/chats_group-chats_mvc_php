@@ -8,6 +8,6 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $this->view->render('home_view.php');
+        $this->view->render(['content_view' => 'home_view.php']);
     }
 }

@@ -8,6 +8,6 @@ class LoginController extends Controller
 {
     public function index()
     {
-        $this->view->render('login_view.php');
+        $this->view->render(['content_view' => 'login_view.php']);
     }
 }
