@@ -1,5 +1,5 @@
 <h1>Регистрация</h1>
-<form class="form-registration" method="post" action="registration/register">
+<form class="form-registration" method="post" action="/registration/register">
     <div class="form-registration__row">
         <label for="reg-username">
             Username:
@@ -27,6 +27,12 @@
     <input type="submit" value="Зарегестрироваться">
 </form>
 
-<?php echo $data; ?>
+<?php if (!empty($data['message'])) echo $data['message']; ?>
+
+<?php if (!empty($data['errors'])): ?>
+    <?php foreach ($data['errors'] as $key => $value): ?>
+        <p><?= $value ?></p>
+    <?php endforeach; ?>
+<?php endif; ?>
 
 <script src="/app/assets/js/checkRegistrationFields.js"></script>
