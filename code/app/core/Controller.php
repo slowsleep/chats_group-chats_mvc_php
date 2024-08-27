@@ -12,4 +12,12 @@ class Controller
     {
         $this->view = new View();
     }
+
+    public static function auth()
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: /login');
+            exit;
+        }
+    }
 }
