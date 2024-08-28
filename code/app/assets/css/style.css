@@ -88,3 +88,18 @@ input:hover {
 .form__row > input, .form__row > input {
     width: 70%;
 }
+
+.form__row__avatar {
+    display: flex;
+    flex-direction: column;
+}
+
+.form__row__avatar__del {
+    display: flex;
+    flex-direction: row;
+    gap:1em;
+}
+
+.form__row__checkbox {
+    width: auto !important;
+}
