@@ -14,7 +14,7 @@ class Route
         $routes = explode('/', $_SERVER['REQUEST_URI']);
 
         if (isset($routes[1]) && !empty($routes[1])) {
-            $controller_name = ucfirst(strtolower($routes[1]));
+            $controller_name = ucfirst(strtolower(explode('?', $routes[1])[0]));
         }
 
         if (isset($routes[2]) && !empty($routes[2])) {
