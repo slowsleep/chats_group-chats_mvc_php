@@ -12,11 +12,12 @@ function createTableUsers()
 
         $query = "CREATE TABLE IF NOT EXISTS users (
             id int(11) NOT NULL AUTO_INCREMENT,
-            username varchar(25) NOT NULL,
-            email varchar(255) NOT NULL,
+            username varchar(25) NOT NULL UNIQUE,
+            email varchar(255) NOT NULL UNIQUE,
             password varchar(255) NOT NULL,
             avatar varchar(255),
             email_confirmed boolean NOT NULL DEFAULT FALSE,
+            email_confirm_token varchar(255),
             created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
             updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id)
