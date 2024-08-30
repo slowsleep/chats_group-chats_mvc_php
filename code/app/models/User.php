@@ -13,7 +13,7 @@ class User extends Model
     /**
      * Creates a new user in the database
      * @param array $data - associative array. keys - [username, email, password]
-     * @return bool
+     * @return bool|string
      */
     public static function create($data)
     {
@@ -22,16 +22,18 @@ class User extends Model
 
             $db = DB::connect();
 
-            $query = 'INSERT INTO users (username, email, password) VALUES (:username, :email, :password)';
+            $query = 'INSERT INTO users (username, email, password, email_confirm_token) VALUES (:username, :email, :password, :email_confirm_token)';
             $stmt = $db->prepare($query);
             $stmt->bindParam(':username', $data['username']);
             $stmt->bindParam(':email', $data['email']);
             $hash_password = password_hash($password . SALT, PASSWORD_DEFAULT);
             $stmt->bindParam(':password', $hash_password);
+            $email_confirm_token = bin2hex(random_bytes(32));
+            $stmt->bindParam(':email_confirm_token', $email_confirm_token);
             $stmt->execute();
 
             if ($stmt) {
-                return true;
+                return $email_confirm_token;
             }
         } catch (PDOException $e) {
             echo $e->getMessage();
@@ -135,6 +137,39 @@ class User extends Model
             $stmt->execute();
             if ($stmt) {
                 return true;
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return false;
+    }
+
+    /**
+     * Activates user in the database
+     * @param string $email_confirm_token
+     * @return bool
+     */
+    public static function activate($email_confirm_token)
+    {
+        try {
+            $db = DB::connect();
+            $query = 'SELECT * FROM users WHERE email_confirm_token = :email_confirm_token';
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':email_confirm_token', $email_confirm_token);
+            $stmt->execute();
+
+            if ($stmt->rowCount() > 0) {
+                $query = 'UPDATE users SET email_confirmed = :email_confirmed, email_confirm_token = :email_confirm_token_after WHERE email_confirm_token = :email_confirm_token_before';
+                $stmt = $db->prepare($query);
+                $email_confirmed = 1;
+                $email_confirm_token_after = '';
+                $stmt->bindParam(':email_confirmed', $email_confirmed);
+                $stmt->bindParam(':email_confirm_token_before', $email_confirm_token);
+                $stmt->bindParam(':email_confirm_token_after', $email_confirm_token_after);
+                $res = $stmt->execute();
+                if ($res) {
+                    return true;
+                }
             }
         } catch (PDOException $e) {
             echo $e->getMessage();
