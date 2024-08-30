@@ -18,7 +18,7 @@ class Route
         }
 
         if (isset($routes[2]) && !empty($routes[2])) {
-            $action_name = strtolower($routes[2]);
+            $action_name = strtolower(explode('?', $routes[2])[0]);
         }
 
         $controller_name .= 'Controller';
