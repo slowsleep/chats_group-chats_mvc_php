@@ -176,4 +176,28 @@ class User extends Model
         }
         return false;
     }
+
+    /**
+     * Gets user by id
+     * @param mixed $username
+     * @return array|bool
+     */
+    public static function getUser($id)
+    {
+        try {
+            $db = DB::connect();
+            $query = 'SELECT * FROM users WHERE id = :id';
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+            $user = $stmt->fetch();
+            
+            if ($user) {
+                return ['id' => $user['id'], 'username' => $user['username'], 'avatar' => $user['avatar']];
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return false;
+    }
 }
