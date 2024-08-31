@@ -28,7 +28,11 @@ class SettingsController extends Controller
             exit;
         }
 
-        if ($_POST['username'] !== $_SESSION['user']['username'] && User::checkUsernameExists($_POST['username'])) {
+        if (
+            strlen($_POST['username']) > 0
+            && $_POST['username'] !== $_SESSION['user']['username']
+            && User::checkUsernameExists($_POST['username'])
+        ) {
             $this->view->render(['content_view' => 'settings_view.php', 'data' => ['message' => 'Пользователь с таким именем уже существует']]);
             exit;
         }
@@ -51,7 +55,8 @@ class SettingsController extends Controller
             }
         }
 
-        $updateUser = User::update($_POST['username'], $uniqueName);
+        $hideEmail = isset($_POST['hide-email']) && $_POST['hide-email'] === 'on' ? 1 : 0;
+        $updateUser = User::update($_POST['username'], $uniqueName, $hideEmail);
 
         if (!$updateUser) {
             $this->view->render(['content_view' => 'settings_view.php', 'data' => ['message' => 'Не удалось обновить профиль']]);
@@ -60,6 +65,7 @@ class SettingsController extends Controller
 
         $_SESSION['user']['username'] = $_POST['username'];
         $_SESSION['user']['avatar'] = $uniqueName;
+        $_SESSION['user']['hide_email'] = $hideEmail;
 
         $this->view->render(['content_view' => 'settings_view.php', 'data' => ['message' => 'Профиль обновлен']]);
     }
