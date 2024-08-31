@@ -2,13 +2,13 @@
 use function App\Tools\generateCsrfToken;
 ?>
 <h1>Регистрация</h1>
-<form class="form" method="post" action="/registration/register">
+<form class="form" method="post" action="/registration/register" id="registration-form">
     <input type="hidden" name="csrf_token" value="<?= generateCsrfToken() ?>">
     <div class="form__row">
         <label for="reg-username">
             Username:
         </label>
-        <input type="text" name="username" id="reg-username" required>
+        <input type="text" name="username" id="reg-username">
     </div>
     <div class="form__row">
         <label for="reg-email">

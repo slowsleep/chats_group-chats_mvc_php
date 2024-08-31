@@ -27,7 +27,7 @@ class RegistrationController extends Controller
 
         $errors = [];
 
-        if (User::checkUsernameExists($_POST['username'])) {
+        if ($_POST['username'] !== '' && User::checkUsernameExists($_POST['username'])) {
             $errors['username'] = 'Пользователь с таким именем уже существует!';
         } else if (User::checkEmailExists($_POST['email'])) {
             $errors['email'] = 'Пользователь с таким email уже существует!';

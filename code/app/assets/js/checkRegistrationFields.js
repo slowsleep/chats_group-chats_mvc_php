@@ -1,4 +1,4 @@
-let formRegistration = document.querySelector(".form-registration");
+let formRegistration = document.querySelector("#registration-form");
 let username = formRegistration.elements["reg-username"];
 let email = formRegistration.elements["reg-email"];
 let password = formRegistration.elements["reg-password"];
@@ -10,7 +10,7 @@ formRegistration.addEventListener("submit", (event) => {
     password.style.borderColor = "#c4c4c4";
     passwordRepeat.style.borderColor = "#c4c4c4";
 
-    let regexpUsername = /^[a-zA-Z0-9]{3,25}$/;
+    let regexpUsername = /^[a-zA-Z0-9]{0,25}$/;
     let regexpEmail = /^([a-zA-Z0-9_.-])+@([a-zA-Z0-9_.-])+\.([a-zA-Z])+/;
     let regexpPassword = /^[a-zA-Z0-9]{8,25}$/;
 
