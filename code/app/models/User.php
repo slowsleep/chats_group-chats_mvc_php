@@ -109,6 +109,7 @@ class User extends Model
                         'username'=> $user['username'],
                         'email'=> $user['email'],
                         'avatar'=> $user['avatar'],
+                        'hide_email'=> $user['hide_email'],
                     ];
                     return $user;
                 }
@@ -125,14 +126,15 @@ class User extends Model
      * @param string $avatar
      * @return bool
      */
-    public static function update($username, $avatar)
+    public static function update($username, $avatar, $hideEmail=0)
     {
         try {
             $db = DB::connect();
-            $query = 'UPDATE users SET username = :username, avatar = :avatar WHERE id = :id';
+            $query = 'UPDATE users SET username = :username, avatar = :avatar, hide_email = :hide_email WHERE id = :id';
             $stmt = $db->prepare($query);
             $stmt->bindParam(':username', $username);
             $stmt->bindParam(':avatar', $avatar);
+            $stmt->bindParam(':hide_email', $hideEmail);
             $stmt->bindParam(':id', $_SESSION['user']['id']);
             $stmt->execute();
             if ($stmt) {
@@ -191,10 +193,27 @@ class User extends Model
             $stmt->bindParam(':id', $id);
             $stmt->execute();
             $user = $stmt->fetch();
-            
+
             if ($user) {
                 return ['id' => $user['id'], 'username' => $user['username'], 'avatar' => $user['avatar']];
             }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return false;
+    }
+
+    public static function getUsers($search)
+    {
+        try {
+            $db = DB::connect();
+            $query = 'SELECT * FROM users WHERE (username LIKE :username OR (email LIKE :email AND hide_email = 0))';
+            $stmt = $db->prepare($query);
+            $stmt->bindValue(':username', "%$search%");
+            $stmt->bindValue(':email', "%$search%");
+            $stmt->execute();
+            $users = $stmt->fetchAll();
+            return $users;
         } catch (PDOException $e) {
             echo $e->getMessage();
         }
