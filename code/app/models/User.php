@@ -195,7 +195,12 @@ class User extends Model
             $user = $stmt->fetch();
 
             if ($user) {
-                return ['id' => $user['id'], 'username' => $user['username'], 'avatar' => $user['avatar']];
+                return [
+                    'id' => $user['id'],
+                    'username' => $user['username'],
+                    'email' => $user['email'],
+                    'avatar' => $user['avatar']
+                ];
             }
         } catch (PDOException $e) {
             echo $e->getMessage();
