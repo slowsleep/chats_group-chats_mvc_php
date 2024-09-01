@@ -12,14 +12,13 @@ class SettingsController extends Controller
     public function index()
     {
         parent::auth();
-
+        refreshCsrfToken();
         $this->view->render(['content_view' => 'settings_view.php']);
     }
 
     public function save()
     {
         parent::auth();
-
         $csrfToken = $_POST['csrf_token'] ?? '';
 
         if (!validateCsrfToken($csrfToken)) {
@@ -67,6 +66,8 @@ class SettingsController extends Controller
         $_SESSION['user']['avatar'] = $uniqueName;
         $_SESSION['user']['hide_email'] = $hideEmail;
 
+        refreshCsrfToken();
+        
         $this->view->render(['content_view' => 'settings_view.php', 'data' => ['message' => 'Профиль обновлен']]);
     }
 }

@@ -12,6 +12,7 @@ class RegistrationController extends Controller
 {
     public function index()
     {
+        refreshCsrfToken();
         $this->view->render(['content_view' => 'registration_view.php', 'title' => 'Регистрация']);
     }
 
@@ -37,13 +38,13 @@ class RegistrationController extends Controller
             $mail->send($_POST['email'], $email_confirm_token);
         }
 
+        refreshCsrfToken();
+
         if (isset($email_confirm_token) && $email_confirm_token) {
             $this->view->render(['content_view' => 'registration_view.php', 'data' => ['message' => 'Регистрация прошла успешно!']]);
         } else {
             $this->view->render(['content_view' => 'registration_view.php', 'data' => ['message' => 'Регистрация не прошла!', 'errors' => $errors]]);
         }
-
-        refreshCsrfToken();
     }
 
     public function activate()

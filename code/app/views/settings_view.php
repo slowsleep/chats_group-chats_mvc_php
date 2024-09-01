@@ -1,10 +1,7 @@
-<?php
-use function App\Tools\generateCsrfToken;
-?>
 <h1>Настройки</h1>
 
 <form class="form" method="post" action="/settings/save" enctype="multipart/form-data" id="settings-form">
-    <input type="hidden" name="csrf_token" value="<?= generateCsrfToken() ?>">
+    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
     <div class="form__row">
         <label for="username">Ник:</label>
         <input type="text" name="username" id="username" value="<?= $_SESSION['user']['username'] ?? '' ?>">

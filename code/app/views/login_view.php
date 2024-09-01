@@ -1,9 +1,6 @@
-<?php
-use function App\Tools\generateCsrfToken;
-?>
 <h1>Вход</h1>
 <form class="form" method="post" action="/login/login">
-    <input type="hidden" name="csrf_token" value="<?= generateCsrfToken() ?>">
+    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
     <div class="form__row">
         <label for="login-email">
             Email:

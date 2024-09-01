@@ -11,6 +11,11 @@ class LoginController extends Controller
 {
     public function index()
     {
+        if (isset($_SESSION['user'])) {
+            header('Location: /home');
+            exit;
+        }
+        refreshCsrfToken();
         $this->view->render(['content_view' => 'login_view.php']);
     }
 
