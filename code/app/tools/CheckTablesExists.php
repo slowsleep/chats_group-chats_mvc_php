@@ -14,7 +14,7 @@ function checkAllTables()
         $tables = array_map(function ($table) {
             return $table->Tables_in_myapp;
         }, $tables);
-        $myTables = ['users', 'chats', 'messages', 'chat_members', 'chat_messages'];
+        $myTables = ['users', 'chats', 'messages', 'chat_members', 'chat_messages', 'subscriptions'];
 
         foreach ($myTables as $myTable) {
             $res = in_array($myTable, $tables) ? true : false;

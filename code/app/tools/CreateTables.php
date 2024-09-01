@@ -114,6 +114,24 @@ function createTableChatMessages()
     }
 }
 
+function createTableSubscriptions()
+{
+    try {
+        $db = DB::connect();
+        $query = "CREATE TABLE IF NOT EXISTS subscriptions (
+            user_id int(11) NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+            subscribed_to_user_id int(11) NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+            UNIQUE (user_id, subscribed_to_user_id)
+        )";
+
+        $db->exec($query);
+
+        echo "Table subscriptions created successfully.<br>";
+    } catch (PDOException $e) {
+        echo $e->getMessage();
+    }
+}
+
 function createAllTables()
 {
     createTableUsers();
@@ -121,4 +139,5 @@ function createAllTables()
     createTableMessages();
     createTableChatMembers();
     createTableChatMessages();
+    createTableSubscriptions();
 }
