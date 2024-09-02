@@ -10,7 +10,9 @@
 </div>
 
 <?php if (isset($data['user']) && $data['user'] && $data['user']['id'] != $_SESSION['user']['id']): ?>
-<div>
+<div style="display: flex;">
+    <a href="/chat?user=<?= $data['user']['id'] ?>" style="padding: .3em; background-color: #337fcc; color: #fff; text-decoration: none; border-radius: 5px;">В диалог</a>
+
     <?php if ($data['isSubscribed']): ?>
         <form action="/profile/unsubscribe" method="post">
             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
