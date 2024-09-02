@@ -83,9 +83,10 @@ function createTableChatMembers()
         $db = DB::connect();
 
         $query = "CREATE TABLE IF NOT EXISTS chat_members (
-            user_id int(11) NOT NULL REFERENCES users (id) ON DELETE CASCADE,
             chat_id int(11) NOT NULL REFERENCES chats (id) ON DELETE CASCADE,
-            is_admin boolean NOT NULL
+            user_id int(11) NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+            is_admin boolean NOT NULL,
+            UNIQUE (chat_id, user_id)
         )";
 
         $db->exec($query);
@@ -103,7 +104,8 @@ function createTableChatMessages()
 
         $query = "CREATE TABLE IF NOT EXISTS chat_messages (
             chat_id int(11) NOT NULL REFERENCES chats (id) ON DELETE CASCADE,
-            message_id int(11) NOT NULL REFERENCES messages (id) ON DELETE CASCADE
+            message_id int(11) NOT NULL REFERENCES messages (id) ON DELETE CASCADE,
+            UNIQUE (chat_id, message_id)
         )";
 
         $db->exec($query);
