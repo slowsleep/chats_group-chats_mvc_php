@@ -8,8 +8,6 @@
             "App\\": "app/"
         },
         "files": [
-            "app/tools/CheckTablesExists.php",
-            "app/tools/CreateTables.php",
             "app/tools/CSRF.php"
         ]
     },
