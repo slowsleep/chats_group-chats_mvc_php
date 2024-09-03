@@ -103,3 +103,36 @@ input:hover {
 .form__row__checkbox {
     width: auto !important;
 }
+
+.chat {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    width: 100%;
+}
+
+.messages {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.message {
+    border-radius: 5px;
+    padding: 1em;
+    background-color: whitesmoke;
+    width: 50%;
+    margin: .1em;
+}
+
+.message--own {
+    background-color: #bdd7c1;
+    align-self: end;
+}
+
+.message__header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
