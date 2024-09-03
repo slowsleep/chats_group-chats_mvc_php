@@ -2,13 +2,20 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 require_once 'config/config.php';
+use App\Tools\TableManager;
 
-use function App\Tools\checkAllTables;
-use function App\Tools\createAllTables;
+$tableManager = new TableManager();
+$isAllTablesExists = $tableManager->checkAllTables();
 
-if (!checkAllTables()) {
-    echo 'All tables are not exist. Creating...<br>';
-    createAllTables();
+echo '<pre>';
+var_dump($isAllTablesExists);
+
+if (!$isAllTablesExists['isAllTablesExists']) {
+    echo 'Not all tables are exists<br>';
+    
+    foreach ($isAllTablesExists['resultByTable'] as $table => $isExist) {
+        $tableManager->createTableIfNotExists($table, $isExist);
+    }
 } else {
     echo 'All tables are exist.';
 }
