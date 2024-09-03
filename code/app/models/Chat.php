@@ -74,4 +74,27 @@ class Chat extends Model {
         }
         return false;
     }
+
+    /**
+     * Get messages of chat
+     * @param array $data - associative array. keys - [chat_id]
+     * @return bool|array
+     */
+    public static function getMessages($data)
+    {
+        try {
+            $db = DB::connect();
+            $query = 'SELECT * FROM messages WHERE id IN (SELECT message_id FROM chat_messages WHERE chat_id = :chat_id)';
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':chat_id', $data['chat_id']);
+            $stmt->execute();
+            
+            if ($stmt->rowCount() > 0) {
+                return $stmt->fetchAll();
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return false;
+    }
 }
