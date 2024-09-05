@@ -30,15 +30,39 @@ class Message extends Model {
                 $stmt->bindParam(':chat_id', $data['chat_id']);
                 $stmt->bindParam(':message_id', $msgId);
                 $stmt->execute();
-                
+
                 if ($stmt) {
                     $db->commit();
-                    return true;
+                    return $msgId;
+                    // return true;
                 } else {
                     $db->rollBack();
                 }
             } else {
                 $db->rollBack();
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return false;
+    }
+
+    /**
+     * Get messages by id
+     * @param int $id
+     * @return array|bool
+     */
+    public static function getMessage($id)
+    {
+        try {
+            $db = DB::connect();
+            $query = 'SELECT * FROM messages WHERE id = :id';
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+            $result = $stmt->fetch();
+            if ($result) {
+                return $result;
             }
         } catch (PDOException $e) {
             echo $e->getMessage();
