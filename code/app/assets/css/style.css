@@ -116,6 +116,7 @@ input:hover {
     display: flex;
     flex-direction: column;
     height: 100%;
+    overflow: auto;
 }
 
 .message {
@@ -131,8 +132,36 @@ input:hover {
     align-self: end;
 }
 
-.message__header {
+.message__date {
+    font-size: .9em;
+    color: #7a7a7a;
+    margin-top: .5em;
+}
+
+.form-chat {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    background-color: white;
+    padding: 0 .5em;
+}
+
+.form-chat >input[type="text"] {
+    width: 100%;
+    border: none;
+    border-radius: 0;
+}
+
+.form-chat > input[type="submit"] {
+    background-color: transparent;
+    background-image: url('/app/assets/img/sendMsg.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    border: none;
+    width: 3em;
+    height: 3em;
+}
+
+.form-chat > input[type="submit"]::before {
+    content: '';
 }
