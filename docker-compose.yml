@@ -6,6 +6,8 @@ services:
     image: module58/fpm
     volumes:
       - ./code:/var/www/html/webchat.local
+    ports:
+      - "3000:3000"
     networks:
       - module58-network
 
