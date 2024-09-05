@@ -45,39 +45,51 @@ class ChatController extends Controller
             'data' => [
                 'chat_id' => $chatId,
                 'contact' => [
-                    'contact_id' => $contactId,
-                    'contact_name' => $contactName
+                    'id' => $contactId,
+                    'name' => $contactName
                 ],
                 'messages' => $messages,
                 'errors' => $errors
-                ]
+            ]
         ]);
     }
 
     public function send()
     {
-        parent::auth();
-
-        $csrfToken = $_POST['csrf_token'] ?? '';
+        $data = json_decode(file_get_contents('php://input'), true);
+        $csrfToken = $data['csrf_token'] ?? '';
 
         if (!validateCsrfToken($csrfToken)) {
             refreshCsrfToken();
-            $this->view->render(['content_view' => 'chat_view.php', 'data' => ['errors' => ['message' => 'Проверка токена CSRF не удалась.']]]);
+            $response['status'] = 'failed';
+            $response['message'] = 'Проверка токена CSRF не удалась.';
+            $response['csrf_token'] = $_SESSION['csrf_token'];
+            http_response_code(403);
+            echo json_encode($response);
             exit;
         }
 
-        $chatId = $_POST['chat_id'];
-        $content = $_POST['content'];
-        $userId = $_SESSION['user']['id'];
+        $chatId = $data['chat_id'];
+        $content = $data['content'];
+        $userId = $data['user_id'];
 
-        $newMsg = Message::create(['chat_id' => $chatId, 'user_id' => $userId, 'content' => $content]);
+        $newMsgId = Message::create(['chat_id' => $chatId, 'user_id' => $userId, 'content' => $content]);
+        $newMsg = Message::getMessage($newMsgId);
 
         refreshCsrfToken();
+        $response['csrf_token'] = $_SESSION['csrf_token'];
 
-        if ($newMsg) {
-            header('Location: /chat?user=' . $_POST['contact_id']);
+        if (!$newMsg) {
+            http_response_code(500);
+            $response['status'] = 'failed';
+            $response['message'] = 'Не удалось отправить сообщение';
         } else {
-            $this->view->render(['content_view' => 'chat_view.php', 'data' => ['message' => 'Не удалось отправить сообщение']]);
+            http_response_code(200);
+            $response['status'] = 'success';
+            $response['message'] = $newMsg;
         }
+
+        echo json_encode($response);
+        exit;
     }
 }
