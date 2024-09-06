@@ -10,7 +10,6 @@
 
 <body>
     <main>
-        <?php include_once APP_DIR . '/views/layout/chat-list.php' ?>
         <div class="content">
             <?php include_once APP_DIR . '/views/' . $content_view; ?>
         </div>
