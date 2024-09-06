@@ -88,7 +88,29 @@ class Chat extends Model {
             $stmt = $db->prepare($query);
             $stmt->bindParam(':chat_id', $data['chat_id']);
             $stmt->execute();
-            
+
+            if ($stmt->rowCount() > 0) {
+                return $stmt->fetchAll();
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return false;
+    }
+
+    /**
+     * Get members (user_id) of chat by id
+     * @param mixed $data
+     * @return array|bool
+     */
+    public static function getMembers($chat_id)
+    {
+        try {
+            $db = DB::connect();
+            $query = 'SELECT user_id FROM chat_members WHERE chat_id = :chat_id';
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':chat_id', $chat_id);
+            $stmt->execute();
             if ($stmt->rowCount() > 0) {
                 return $stmt->fetchAll();
             }
