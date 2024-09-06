@@ -16,11 +16,15 @@ main {
     justify-content: space-between;
 }
 
+.chat-page {
+    display: flex;
+    height: 100%;
+}
+
 .chat-list {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    width: 100%;
 }
 
 .chat-list__dialogs {
@@ -34,7 +38,7 @@ main {
 }
 
 .content {
-    width: 200%;
+    width: 300%;
     padding: 1em;
 }
 
