@@ -208,6 +208,11 @@ class User extends Model
         return false;
     }
 
+    /**
+     * Get users by username or email
+     * @param string $search
+     * @return array|bool
+     */
     public static function getUsers($search)
     {
         try {
@@ -219,6 +224,31 @@ class User extends Model
             $stmt->execute();
             $users = $stmt->fetchAll();
             return $users;
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return false;
+    }
+
+    /**
+     * Get user's chats
+     * @param bool $is_group
+     * @return array|bool
+     */
+    public static function getChats($is_group)
+    {
+        try {
+            $db = DB::connect();
+            $query = 'SELECT chat_id FROM chat_members JOIN chats ON chat_members.chat_id = chats.id WHERE user_id = :user_id AND is_group = :is_group';
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':user_id', $_SESSION['user']['id']);
+            $stmt->bindParam(':is_group', $is_group);
+            $stmt->execute();
+
+            if ($stmt->rowCount() > 0) {
+                $chats = $stmt->fetchAll();
+                return $chats;
+            }
         } catch (PDOException $e) {
             echo $e->getMessage();
         }
