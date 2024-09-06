@@ -11,7 +11,7 @@ window.addEventListener('wheel', function(){
 })
 
 window.setInterval(function(){
-	if(!isPaused){
+	if(!isPaused && messages) {
         messages.scrollTop = messages.scrollHeight;
 	}
 }, 500);
