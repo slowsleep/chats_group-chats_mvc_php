@@ -55,9 +55,9 @@ while (true) {
                     if (!isset($chats[$chat_id])) {
                         $chats[$chat_id] = [];
                     }
-                    // if (!in_array($changed_socket, $chats[$chat_id])) {
-                    $chats[$chat_id][] = $changed_socket;
-                    // }
+                    if (!in_array($changed_socket, $chats[$chat_id])) {
+                        $chats[$chat_id][] = $changed_socket;
+                    }
 
                     $response = mask(json_encode(array('type' => 'system', 'message' => $ip.' connected')));
                     send_message_to_chat($chat_id, $response);
@@ -99,7 +99,6 @@ while (true) {
             socket_getpeername($changed_socket, $ip);
             unset($clients[$found_socket]);
             unset($client_info[(int)$changed_socket]);
-
 
             $response = mask(json_encode(array('type' => 'system', 'message' => $ip.' disconnected')));
             send_message_to_chat($chat_id, $response);
