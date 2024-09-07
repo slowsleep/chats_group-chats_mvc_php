@@ -98,4 +98,28 @@ class Subscription extends Model {
         }
         return false;
     }
+
+    /**
+     * Search subscriptions by username or email
+     * @param array $data - associative array. keys - [search, user_id]
+     * @return array|bool
+     */
+    public static function searchSubscriptions($data)
+    {
+        try {
+            $db = DB::connect();
+            $query = 'SELECT id, username, email FROM users WHERE (username LIKE :search OR email LIKE :search) AND id IN (SELECT subscribed_to_user_id FROM subscriptions WHERE user_id = :user_id)';
+            $stmt = $db->prepare($query);
+            $search = '%' . $data['search'] . '%';
+            $stmt->bindParam(':search', $search);
+            $stmt->bindParam(':user_id', $data['user_id']);
+            $stmt->execute();
+            if ($stmt->rowCount() > 0) {
+                return $stmt->fetchAll();
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return false;
+    }
 }
