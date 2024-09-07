@@ -15,7 +15,10 @@ if (popup) {
     let addUserBtn = document.querySelectorAll(".add-user");
     let removeUserBtn = document.querySelectorAll(".remove-user");
     let createGroupBtn = document.querySelector(".popup__content__create");
+    let usersList = document.querySelector(".popup__content__users__list");
+    let userList = [];
 
+    // Получение списка контактов при открытии окна
     fetch('/api/user/contacts', {
         method: 'GET',
         headers: {
@@ -31,19 +34,65 @@ if (popup) {
     .then((data) => {
         if (data.status === 'success') {
             let contacts = data.contacts;
-            console.log(contacts);
-
-            let usersList = document.querySelector(".popup__content__users__list");
             contacts.forEach(element => {
                 let userTitle = element.username ? element.username : element.email;
                 let user = createUserElement(userTitle, element.id);
                 usersList.appendChild(user);
             });
-            console.log("контакты получены");
         } else {
             console.log(data.message);
         }
     })
+
+    addUserBtn.forEach(element => {
+        element.addEventListener("click", addUser);
+    })
+
+    removeUserBtn.forEach(element => {
+        element.addEventListener("click", removeUser);
+    })
+
+    // Обработка поиска контактов
+    let createGroupForm = document.querySelector("#create-group-form");
+
+    createGroupForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form); // Собираем данные из формы
+        // Преобразуем FormData в строку параметров
+        const params = new URLSearchParams(formData);
+
+        fetch(`/api/user/searchcontacts?${params.toString()}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then((data) => {
+            if (data.status === 'success') {
+                let contacts = data.contacts;
+                usersList.innerHTML = "";
+                contacts.forEach(element => {
+                    let userTitle = element.username ? element.username : element.email;
+                    let user = createUserElement(userTitle, element.id);
+                    usersList.appendChild(user);
+                });
+            } else {
+                console.log(data.message);
+            }
+        })
+    });
+
+    createGroupBtn.addEventListener("click", (event) => {
+        event.preventDefault();
+        console.log(userList);
+    });
 
     function createUserElement(username, id) {
         let user = document.createElement('li');
@@ -67,12 +116,6 @@ if (popup) {
         return user;
     }
 
-    let userList = [];
-
-    addUserBtn.forEach(element => {
-        element.addEventListener("click", addUser);
-    })
-
     function addUser(event) {
         event.preventDefault();
         let userId = event.currentTarget.parentNode.parentNode.getAttribute("data-user-id");
@@ -81,10 +124,6 @@ if (popup) {
         let remBtn = event.currentTarget.nextElementSibling;
         remBtn.style.display = "block";
     }
-
-    removeUserBtn.forEach(element => {
-        element.addEventListener("click", removeUser);
-    })
 
     function removeUser(event) {
         event.preventDefault();
@@ -95,9 +134,4 @@ if (popup) {
         let addBtn = event.currentTarget.previousElementSibling;
         addBtn.style.display = "block";
     }
-
-    createGroupBtn.addEventListener("click", (event) => {
-        event.preventDefault();
-        console.log(userList);
-    });
 }
