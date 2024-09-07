@@ -3,6 +3,7 @@
 namespace App\Routing;
 
 use App\Core\View;
+use ReflectionMethod;
 
 class Route
 {
@@ -54,6 +55,12 @@ class Route
         }
 
         $controller = new $controller_name;
+
+        // Разрешено показывать только публичные методы
+        $reflectionMethod = new ReflectionMethod($controller_name, $action_name);
+        if (!$reflectionMethod->isPublic()) {
+            self::notFound();
+        }
 
         if (!method_exists($controller, $action_name)) {
             self::notFound();
