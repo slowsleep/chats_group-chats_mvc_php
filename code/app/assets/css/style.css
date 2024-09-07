@@ -16,6 +16,18 @@ main {
     justify-content: space-between;
 }
 
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+a:visited {
+    color: inherit;
+}
+
 .chat-page {
     display: flex;
     height: 100%;
@@ -25,6 +37,7 @@ main {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    width: 50%;
 }
 
 .chat-list__dialogs {
@@ -39,7 +52,6 @@ main {
 
 .content {
     width: 300%;
-    padding: 1em;
 }
 
 .side-menu {
@@ -168,4 +180,42 @@ input:hover {
 
 .form-chat > input[type="submit"]::before {
     content: '';
+}
+
+.popup {
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, .5);
+    position: fixed;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.popup__content {
+    background-color: white;
+    padding: 1em;
+    border-radius: .5em;
+}
+
+.popup__content__users__list__item {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between
+}
+
+.popup__close {
+    float: right;
+}
+
+.add-user {
+    border-radius: 5px;
+    background-color: aqua;
+}
+
+.remove-user {
+    border-radius: 5px;
+    background-color: tomato;
+    display: none;
 }
