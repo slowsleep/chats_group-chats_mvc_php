@@ -15,6 +15,8 @@
         </div>
         <?php include_once APP_DIR . '/views/layout/side-menu.php' ?>
     </main>
+    <?php include_once APP_DIR . '/views/layout/popup.php' ?>
+    <script src="/app/assets/js/createGroup.js"></script>
 </body>
 
 </html>
