@@ -232,17 +232,17 @@ class User extends Model
 
     /**
      * Get user's chats
-     * @param bool $is_group
+     * @param array $data - associative array. keys - [user_id, is_group]
      * @return array|bool
      */
-    public static function getChats($is_group)
+    public static function getChats($data)
     {
         try {
             $db = DB::connect();
             $query = 'SELECT chat_id FROM chat_members JOIN chats ON chat_members.chat_id = chats.id WHERE user_id = :user_id AND is_group = :is_group';
             $stmt = $db->prepare($query);
-            $stmt->bindParam(':user_id', $_SESSION['user']['id']);
-            $stmt->bindParam(':is_group', $is_group);
+            $stmt->bindParam(':user_id', $data['user_id']);
+            $stmt->bindParam(':is_group', $data['is_group']);
             $stmt->execute();
 
             if ($stmt->rowCount() > 0) {
