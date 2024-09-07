@@ -5,6 +5,9 @@
             <ul>
                 <?php foreach ($data['chats'] as $chat) : ?>
                     <li>
+                        <a href="/profile?user=<?= $chat['user_id'] ?>">
+                            <img src="<?= $chat['avatar'] ? '/app/uploads/' . $chat['avatar'] : '/app/assets/img/avatar.png' ?>" alt="Avatar" width="30">
+                        </a>
                         <a href="/chat?user=<?= $chat['user_id'] ?>""><?= $chat['title'] ?></a>
                     </li>
                 <?php endforeach; ?>
@@ -15,7 +18,17 @@
         </div>
         <hr>
         <div class="chat-list__groups">
-            <p>2</p>
+            <?php if ($data['groups']) : ?>
+                <ul>
+                    <?php foreach ($data['groups'] as $group) : ?>
+                        <li>
+                            <a href="/chat/group?id=<?= $group['chat_id'] ?>">Групповой чат <?= $group['chat_id'] ?></a>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php else : ?>
+                <p>Нет групп</p>
+            <?php endif; ?>
         </div>
     </div>
     <hr>
