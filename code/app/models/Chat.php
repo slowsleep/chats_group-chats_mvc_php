@@ -9,7 +9,7 @@ use PDOException;
 class Chat extends Model {
     /**
      * Create the chat
-     * @param array $data - associative array. keys - [user_id, contact_id, is_group]
+     * @param array $data - associative array. keys - [user_id, is_admin, is_group]
      * @return bool|int
      */
     public static function create($data)
@@ -23,23 +23,15 @@ class Chat extends Model {
             $stmt->execute();
             $chatId = $db->lastInsertId();
             if ($chatId) {
-                $query = 'INSERT INTO chat_members (user_id, chat_id, is_admin) VALUES (:user_id, :chat_id, 0)';
+                $query = 'INSERT INTO chat_members (user_id, chat_id, is_admin) VALUES (:user_id, :chat_id, :is_admin)';
                 $stmt = $db->prepare($query);
                 $stmt->bindParam(':user_id', $data['user_id']);
                 $stmt->bindParam(':chat_id', $chatId);
+                $stmt->bindParam(':is_admin', $data['is_admin']);
                 $stmt->execute();
                 if ($stmt) {
-                    $query = 'INSERT INTO chat_members (user_id, chat_id, is_admin) VALUES (:contact_id, :chat_id, 0)';
-                    $stmt = $db->prepare($query);
-                    $stmt->bindParam(':contact_id', $data['contact_id']);
-                    $stmt->bindParam(':chat_id', $chatId);
-                    $stmt->execute();
-                    if ($stmt) {
-                        $db->commit();
-                        return $chatId;
-                    } else {
-                        $db->rollBack();
-                    }
+                    $db->commit();
+                    return $chatId;
                 } else {
                     $db->rollBack();
                 }
@@ -113,6 +105,51 @@ class Chat extends Model {
             $stmt->execute();
             if ($stmt->rowCount() > 0) {
                 return $stmt->fetchAll();
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return false;
+    }
+
+    /**
+     * Summary of addMember
+     * @param array $data - associative array. keys - [user_id, chat_id]
+     * @return bool
+     */
+    public static function addMember($data)
+    {
+        try {
+            $db = DB::connect();
+            $query = 'INSERT INTO chat_members (user_id, chat_id, is_admin) VALUES (:user_id, :chat_id, 0)';
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':user_id', $data['user_id']);
+            $stmt->bindParam(':chat_id', $data['chat_id']);
+            $stmt->execute();
+            if ($stmt) {
+                return true;
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return false;
+    }
+
+    /**
+     * Delete chat by id
+     * @param int $id
+     * @return bool
+     */
+    public static function destroy($id)
+    {
+        try {
+            $db = DB::connect();
+            $query = 'DELETE FROM chat_members WHERE chat_id = :id';
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+            if ($stmt) {
+                return true;
             }
         } catch (PDOException $e) {
             echo $e->getMessage();
