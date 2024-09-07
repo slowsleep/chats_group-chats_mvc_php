@@ -73,7 +73,7 @@ if (chatForm) {
         let message;
 
         // отправляем запрос к контроллеру
-        fetch('/chat/send', {
+        fetch('/api/chat/send', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
