@@ -14,7 +14,7 @@ createGroup.addEventListener("click", (event) => {
 if (popup) {
     let addUserBtn = document.querySelectorAll(".add-user");
     let removeUserBtn = document.querySelectorAll(".remove-user");
-    let createGroupBtn = document.querySelector(".popup__content__create");
+    let createGroupForm = document.querySelector("#create-group-form");
     let usersList = document.querySelector(".popup__content__users__list");
     let userList = [];
 
@@ -53,9 +53,9 @@ if (popup) {
     })
 
     // Обработка поиска контактов
-    let createGroupForm = document.querySelector("#create-group-form");
+    let searchOwnContactsForm = document.querySelector("#search-own-contacts-form");
 
-    createGroupForm.addEventListener("submit", (event) => {
+    searchOwnContactsForm.addEventListener("submit", (event) => {
         event.preventDefault();
         const form = event.target;
         const formData = new FormData(form); // Собираем данные из формы
@@ -89,9 +89,38 @@ if (popup) {
         })
     });
 
-    createGroupBtn.addEventListener("click", (event) => {
+    // Создание группового чата
+    createGroupForm.addEventListener("submit", (event) => {
+        let csrf_token = createGroupForm.elements['csrf_token'].value;
         event.preventDefault();
-        console.log(userList);
+
+        if (userList.length < 2) {
+            alert("Необходимо добавить 2 или более контактов");
+            return;
+        }
+
+        fetch('/api/chat/creategroup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({users: userList, csrf_token})
+        })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then((data) => {
+            createGroupForm.elements['csrf_token'].value = data.csrf_token;
+            if (data.status === 'success') {
+                console.log(data.message, data.chat_id);
+                window.location.href = '/chat/group?id' + data.chat_id;
+            } else {
+                console.log(data.message);
+            }
+        })
     });
 
     function createUserElement(username, id) {
