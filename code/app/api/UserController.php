@@ -2,21 +2,14 @@
 
 namespace App\Api;
 
-use App\Core\Controller;
+use App\Core\ApiController;
 use App\Models\Subscription;
 
-class UserController extends Controller
+class UserController extends ApiController
 {
     public function contacts()
     {
-
-        if (!isset($_SESSION['user'])) {
-            $response['status'] = 'failed';
-            $response['message'] = 'Пользователь не авторизован';
-            http_response_code(403);
-            echo json_encode($response);
-            exit;
-        }
+        parent::auth();
 
         $usersContacts = Subscription::getSubscriptions($_SESSION['user']['id']);
 
@@ -34,14 +27,7 @@ class UserController extends Controller
 
     public function searchContacts()
     {
-
-        if (!isset($_SESSION['user'])) {
-            $response['status'] = 'failed';
-            $response['message'] = 'Пользователь не авторизован';
-            http_response_code(403);
-            echo json_encode($response);
-            exit;
-        }
+        parent::auth();
 
         $contacts = Subscription::searchSubscriptions(['search' => $_GET['search'], 'user_id' => $_SESSION['user']['id']]);
 

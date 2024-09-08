@@ -2,28 +2,18 @@
 
 namespace App\Api;
 
-use App\Core\Controller;
+use App\Core\ApiController;
 use App\Models\Message;
 use App\Models\Chat;
-use function App\Tools\validateCsrfToken;
 use function App\Tools\refreshCsrfToken;
 
-class ChatController extends Controller
+class ChatController extends ApiController
 {
     public function send()
     {
+        parent::auth();
         $data = json_decode(file_get_contents('php://input'), true);
-        $csrfToken = $data['csrf_token'] ?? '';
-
-        if (!validateCsrfToken($csrfToken)) {
-            refreshCsrfToken();
-            $response['status'] = 'failed';
-            $response['message'] = 'Проверка токена CSRF не удалась.';
-            $response['csrf_token'] = $_SESSION['csrf_token'];
-            http_response_code(403);
-            echo json_encode($response);
-            exit;
-        }
+        parent::csrf($data['csrf_token']);
 
         $chatId = $data['chat_id'];
         $content = $data['content'];
@@ -51,18 +41,9 @@ class ChatController extends Controller
 
     public function createGroup()
     {
+        parent::auth();
         $data = json_decode(file_get_contents('php://input'), true);
-        $csrfToken = $data['csrf_token'] ?? '';
-
-        if (!validateCsrfToken($csrfToken)) {
-            refreshCsrfToken();
-            $response['status'] = 'failed';
-            $response['message'] = 'Проверка токена CSRF не удалась.';
-            $response['csrf_token'] = $_SESSION['csrf_token'];
-            http_response_code(403);
-            echo json_encode($response);
-            exit;
-        }
+        parent::csrf($data['csrf_token']);
 
         $users = $data['users'];
         $chatId = Chat::create(['user_id' => $_SESSION['user']['id'], 'is_admin' => 1, 'is_group' => 1]);
@@ -95,6 +76,5 @@ class ChatController extends Controller
         $response['chat_id'] = $chatId;
         echo json_encode($response);
         exit;
-
     }
 }
