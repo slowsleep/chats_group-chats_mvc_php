@@ -32,4 +32,20 @@ class ApiController
             exit;
         }
     }
+
+    /**
+     * Check if post data is exists
+     * @param mixed $data
+     * @return mixed
+     */
+    public static function checkData($data)
+    {
+        if (!$data) {
+            $response['status'] = 'failed';
+            $response['message'] = "Payload not received";
+            http_response_code(400);
+            echo json_encode($response);
+            exit;
+        }
+    }
 }
