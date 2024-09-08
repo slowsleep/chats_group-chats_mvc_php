@@ -156,4 +156,27 @@ class Chat extends Model {
         }
         return false;
     }
+
+    /**
+     * Check if user is member of chat
+     * @param array $data - associative array. keys - [user_id, chat_id]
+     * @return bool
+     */
+    public static function isMember($data)
+    {
+        try {
+            $db = DB::connect();
+            $query = 'SELECT * FROM chat_members WHERE chat_id = :chat_id AND user_id = :user_id';
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':chat_id', $data['chat_id']);
+            $stmt->bindParam(':user_id', $data['user_id']);
+            $stmt->execute();
+            if ($stmt->rowCount() > 0) {
+                return true;
+            }
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return false;
+    }
 }
