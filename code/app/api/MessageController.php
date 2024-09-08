@@ -22,15 +22,7 @@ class MessageController extends ApiController
     {
         parent::auth();
         $data = json_decode(file_get_contents('php://input'), true);
-
-        if (!$data) {
-            $response['status'] = 'failed';
-            $response['message'] = "Payload not received";
-            http_response_code(400);
-            echo json_encode($response);
-            exit;
-        }
-
+        parent::checkData($data);
         parent::csrf($data['csrf_token']);
 
         $messageId = $data['message_id'];
@@ -48,6 +40,25 @@ class MessageController extends ApiController
             $response['status'] = 'success';
             $response['message'] = 'Сообщение отредактировано';
             $response['updated_at'] = $isEdited['updated_at'];
+        }
+
+        echo json_encode($response);
+        exit;
+    }
+
+    public function delete()
+    {
+        parent::auth();
+        $data = json_decode(file_get_contents('php://input'), true);
+        parent::checkData($data);
+        $isDelete = Message::destroy($data['message_id']);
+
+        if (!$isDelete) {
+            $response['status'] = 'failed';
+            $response['message'] = 'Не удалось удалить сообщение';
+        } else {
+            $response['status'] = 'success';
+            $response['message'] = 'Сообщение удалено';
         }
 
         echo json_encode($response);
