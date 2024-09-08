@@ -29,9 +29,17 @@ function isOwnMessage($message)
             <div class="messages" id="messages">
                 <?php if (isset($data['messages']) && $data['messages']): ?>
                     <?php foreach ($data['messages'] as $message): ?>
-                        <div class="message <?= isOwnMessage($message) ? 'message--own' : '' ?>">
-                            <p><?= $message['content'] ?></p>
-                            <p class="message__date"><?= $message['created_at'] ?></p>
+                        <div
+                            class="message <?= isOwnMessage($message) ? 'message--own' : '' ?>"
+                            data-msgid="<?= $message['id'] ?>"
+                        >
+                            <p class="message__content"><?= $message['content'] ?></p>
+                            <div class="message__footer">
+                                <p><?= $message['updated_at'] ?></p>
+                                <?php if ($message['created_at'] != $message['updated_at']): ?>
+                                    <p>(ред.)</p>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -45,12 +53,20 @@ function isOwnMessage($message)
                 <input type="text" name="content" placeholder="Наберите Ваше сообщение здесь">
                 <input type="submit" value="">
             </form>
-        <?php endif; ?>
+            <?php endif; ?>
+        </div>
     </div>
 </div>
-
+<div class="message-menu">
+    <ul>
+        <li id="msg-edit">Редактировать</li>
+        <li id="msg-delete">Удалить</li>
+        <li id="msg-forward">Переслать</li>
+    </ul>
+</div>
 <script>
     let messages = document.querySelector('#messages');
 </script>
 <script src="/app/assets/js/scrollChat.js"></script>
 <script src="/app/assets/js/chat.js"></script>
+<script src="/app/assets/js/msgHandler.js"></script>

@@ -28,8 +28,11 @@ if (chatForm) {
                 switch (res_type) {
                     case 'usermsg':
                         let msgDiv = document.createElement('div');
+                        msgDiv.setAttribute('data-msgid', message.id);
                         msgDiv.className = 'message ' + (message.user_id == user_id ? 'message--own' : '');
-                        msgDiv.innerHTML = '<p>' + message.content + '</p><p class="message__date">' + message.updated_at + '</p>';
+                        msgDiv.innerHTML = '<p class="message__content">' + message.content + '</p>' +
+                            '<div class="message__footer"><p>' + message.updated_at + '</p>';
+                        if (message.created_at != message.updated_at) msgDiv.innerHTML += '<p>(ред.)</p></div>';
                         messages.appendChild(msgDiv);
                         break;
                     case 'system':

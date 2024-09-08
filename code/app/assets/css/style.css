@@ -148,10 +148,13 @@ input:hover {
     align-self: end;
 }
 
-.message__date {
+.message__footer {
     font-size: .9em;
     color: #7a7a7a;
     margin-top: .5em;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 .form-chat {
@@ -218,4 +221,21 @@ input:hover {
     border-radius: 5px;
     background-color: tomato;
     display: none;
+}
+
+.message-menu {
+    display: none;
+    background-color: whitesmoke;
+    position: absolute;
+    border: 1px solid #5f5f5f;
+}
+
+.message-menu > ul > li {
+    padding: .5em;
+    cursor: pointer;
+    list-style: none;
+}
+
+.message-menu > ul > li:hover {
+    background-color: #c9c9c9;
 }
