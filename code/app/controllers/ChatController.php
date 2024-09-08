@@ -54,6 +54,7 @@ class ChatController extends Controller
             $messages = Chat::getMessages(['chat_id' => $chatId]);
         } else {
             $errors['user'] = 'Пользователь не найден';
+            header('HTTP/1.0 404 Not Found');
         }
 
         $this->view->render([
@@ -89,6 +90,24 @@ class ChatController extends Controller
             ]);
             exit;
         }
+
+        $isMember = Chat::isMember(['user_id' => $_SESSION['user']['id'], 'chat_id' => $_GET['id']]);
+
+        if (!$isMember) {
+            $errors['user'] = 'Групповой чат не найден';
+            header('HTTP/1.0 404 Not Found');
+            $this->view->render([
+                'content_view' => '/chat/chat_view.php',
+                'title' => '404',
+                'data' => [
+                    'errors' => $errors,
+                    'chats' => $chats,
+                    'groups' => $groups
+                ]
+                ]);
+            exit;
+        }
+
         $groupId = $_GET['id'];
         $messages = Chat::getMessages(['chat_id' => $groupId]);
 

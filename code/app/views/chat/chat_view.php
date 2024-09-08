@@ -8,21 +8,22 @@ function isOwnMessage($message)
     <?php include_once APP_DIR . '/views/chat/chat-list.php' ?>
     <div class="chat">
 
-        <?php if (!isset($_GET['user']) && (!isset($_GET['id'])) ): ?>
-            <h1>Выберите чат для начала общения</h1>
+        <?php if (!isset($_GET['user']) && (!isset($_GET['id'])) || (isset($data['errors']) && $data['errors'])): ?>
+            <div>
+                <h1>Выберите чат для начала общения</h1>
+                <?php if (isset($data['errors']) && $data['errors']): ?>
+                    <div>
+                        <?php foreach ($data['errors'] as $error): ?>
+                            <p><?= $error ?></p>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
         <?php else: ?>
             <?php if (isset($_GET['user'])): ?>
                 <h3>Чат с пользователем <?= $data['contact']['name'] ?></h3>
             <?php elseif (isset($_GET['id'])): ?>
                 <h3>Групповой чат <?= $_GET['id'] ?></h3>
-            <?php endif; ?>
-
-            <?php if (isset($data['errors']) && $data['errors']): ?>
-                <div>
-                    <?php foreach ($data['errors'] as $error): ?>
-                        <p><?= $error ?></p>
-                    <?php endforeach; ?>
-                </div>
             <?php endif; ?>
 
             <div class="messages" id="messages">
