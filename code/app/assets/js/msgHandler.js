@@ -80,6 +80,34 @@ if (messages) {
                                     })
                             }
                         });
+
+                        // Обработка нажатия на кнопки удаления
+                        msgDeleteBtn.addEventListener("click", () => {
+                            let isDelete = confirm('Удалить сообщение?');
+                            if (isDelete) {
+                                fetch(`/api/message/delete`, {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({
+                                            message_id: msgId
+                                        })
+                                    })
+                                    .then((response) => {
+                                        if (!response.ok) {
+                                            throw new Error(`HTTP error! status: ${response.status}`);
+                                        }
+                                        return response.json();
+                                    })
+                                    .then((data) => {
+                                        if (data.status === 'success') {
+                                            curElem.remove();
+                                            console.log("is deleted");
+                                        }
+                                    })
+                            }
+                        });
                     }
                 })
         }
