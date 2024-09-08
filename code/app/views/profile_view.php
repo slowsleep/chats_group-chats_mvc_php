@@ -1,7 +1,7 @@
 <h1>Profile</h1>
 <div>
     <?php if (!empty($data['user'])): ?>
-    <img src="<?= $data['user']['avatar'] ? '/app/uploads/' . $data['user']['avatar'] : '/app/assets/img/avatar.png' ?>" alt="Avatar">
+    <img src="<?= $data['user']['avatar'] ? '/app/uploads/' . $data['user']['avatar'] : '/app/assets/img/avatar.png' ?>" alt="Avatar" width="200">
     <p>Username: <?= $data['user']['username'] ?></p>
     <p>Email: <?= $data['user']['email'] ?></p>
     <?php else: ?>
