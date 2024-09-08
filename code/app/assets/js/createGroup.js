@@ -2,16 +2,18 @@ let createGroup = document.querySelector("#create-group");
 let popup = document.querySelector(".popup");
 let popupCloseBtn = document.querySelector("#pupup-close");
 
-createGroup.addEventListener("click", (event) => {
-    event.preventDefault();
-    popup.style.display = "flex";
+if (createGroup) {
+    createGroup.addEventListener("click", (event) => {
+        event.preventDefault();
+        popup.style.display = "flex";
 
-    popupCloseBtn.addEventListener("click", () => {
-        popup.style.display = "none";
+        popupCloseBtn.addEventListener("click", () => {
+            popup.style.display = "none";
+        });
     });
-});
+}
 
-if (popup) {
+if (createGroup && popup) {
     let addUserBtn = document.querySelectorAll(".add-user");
     let removeUserBtn = document.querySelectorAll(".remove-user");
     let createGroupForm = document.querySelector("#create-group-form");
