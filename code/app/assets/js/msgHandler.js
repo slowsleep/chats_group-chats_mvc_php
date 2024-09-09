@@ -1,4 +1,11 @@
 let msgMenu = document.querySelector(".message-menu");
+let msgEditBtn = msgMenu.querySelector("#msg-edit");
+let msgDeleteBtn = msgMenu.querySelector("#msg-delete");
+let msgForwardBtn = msgMenu.querySelector("#msg-forward");
+
+// Хранение ссылок на текущие обработчики манипулирования сообщением
+let currentEditHandler;
+let currentDeleteHandler;
 
 if (messages) {
     // Вешаем событие на контейнер сообщений
@@ -33,12 +40,25 @@ if (messages) {
                         msgMenu.style.left = `${event.pageX}px`;
                         msgMenu.style.top = `${event.pageY}px`;
 
-                        let msgEditBtn = msgMenu.querySelector("#msg-edit");
-                        let msgDeleteBtn = msgMenu.querySelector("#msg-delete");
-                        let msgForwardBtn = msgMenu.querySelector("#msg-forward");
+                        // Удаляем предыдущий обработчик
+                        if (currentEditHandler) {
+                            msgEditBtn.removeEventListener("click", currentEditHandler);
+                        }
 
-                        // Обработка нажатия на кнопки редактирования
-                        msgEditBtn.addEventListener("click", () => {
+                        // Сохраняем текущий обработчик, чтобы его можно было удалить при следующем вызове
+                        currentEditHandler = handlerEditMessageBtn;
+                        msgEditBtn.addEventListener("click", handlerEditMessageBtn);
+
+                        if (currentDeleteHandler) {
+                            msgDeleteBtn.removeEventListener("click", currentDeleteHandler);
+                        }
+
+                        currentDeleteHandler = deleteMessage;
+                        msgDeleteBtn.addEventListener("click", deleteMessage);
+
+                        function handlerEditMessageBtn(event) {
+                            event.preventDefault();
+
                             let content = curElem.querySelector(".message__content").innerText;
                             chatForm.elements['content'].value = content;
                             // Удаляем предыдущий евент, чтобы сообщение не отправлялось
@@ -48,6 +68,7 @@ if (messages) {
                             function editMessage(event) {
                                 event.preventDefault();
                                 let newContent = chatForm.elements['content'].value;
+
                                 // Отправляем запрос на редактирование сообщения
                                 fetch(`/api/message/edit`, {
                                         method: 'POST',
@@ -57,7 +78,7 @@ if (messages) {
                                         body: JSON.stringify({
                                             message_id: msgId,
                                             content: newContent,
-                                            csrf_token: chatForm.elements['csrf_token'].value
+                                            csrf_token: csrfToken.getAttribute('content')
                                         })
                                     })
                                     .then((response) => {
@@ -71,7 +92,7 @@ if (messages) {
                                             curElem.querySelector(".message__content").innerText = chatForm.elements['content'].value;
                                             curElem.querySelector(".message__footer").innerHTML = '<p>' + data.updated_at + '</p><p>(ред.)</p>';
                                         }
-                                        chatForm.elements['csrf_token'].value = data.csrf_token;
+                                        updateCsrfToken(data.csrf_token);
                                         chatForm.elements['content'].value = '';
                                         // Удаляем обработчик редактирования сообщения
                                         chatForm.removeEventListener("submit", editMessage);
@@ -79,10 +100,9 @@ if (messages) {
                                         chatForm.addEventListener("submit", sendMessage);
                                     })
                             }
-                        });
+                        }
 
-                        // Обработка нажатия на кнопки удаления
-                        msgDeleteBtn.addEventListener("click", () => {
+                        function deleteMessage() {
                             let isDelete = confirm('Удалить сообщение?');
                             if (isDelete) {
                                 fetch(`/api/message/delete`, {
@@ -91,7 +111,8 @@ if (messages) {
                                             'Content-Type': 'application/json'
                                         },
                                         body: JSON.stringify({
-                                            message_id: msgId
+                                            message_id: msgId,
+                                            csrf_token: csrfToken.getAttribute('content')
                                         })
                                     })
                                     .then((response) => {
@@ -103,11 +124,12 @@ if (messages) {
                                     .then((data) => {
                                         if (data.status === 'success') {
                                             curElem.remove();
-                                            console.log("is deleted");
+                                            updateCsrfToken(data.csrf_token);
                                         }
                                     })
                             }
-                        });
+                        }
+
                     }
                 })
         }
