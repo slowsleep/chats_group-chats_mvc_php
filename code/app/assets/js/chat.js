@@ -100,7 +100,7 @@ if (chatForm) {
                 } else {
                     console.error('Create message error:', data.message);
                 }
-                chatForm.elements['csrf_token'].value = data.csrf_token;
+                updateCsrfToken(data.csrf_token);
             })
     }
 }
