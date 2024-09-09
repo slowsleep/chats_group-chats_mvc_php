@@ -51,7 +51,11 @@ class MessageController extends ApiController
         parent::auth();
         $data = json_decode(file_get_contents('php://input'), true);
         parent::checkData($data);
+        parent::csrf($data['csrf_token'] ?? '');
         $isDelete = Message::destroy($data['message_id']);
+
+        refreshCsrfToken();
+        $response['csrf_token'] = $_SESSION['csrf_token'];
 
         if (!$isDelete) {
             $response['status'] = 'failed';
