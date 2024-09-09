@@ -9,7 +9,6 @@ if (chatForm) {
 
     if (window.location.search) {
         let getUserIdOrChatId = window.location.search.split('?')[1].split('=')[1];
-        console.log(getUserIdOrChatId);
 
         if (getUserIdOrChatId) {
             websocket = new WebSocket(wsUrl);
