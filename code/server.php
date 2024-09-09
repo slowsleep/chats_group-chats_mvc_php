@@ -44,7 +44,7 @@ while (true) {
             $received_text = unmask($buf);
             $tst_msg = json_decode($received_text, true);
 
-            if (isset($tst_msg['chat_id']) && $tst_msg['chat_id']) {
+            if ($tst_msg['type'] == 'start') {
                 $chat_id = $tst_msg['chat_id'];
 
                 if (!$client_info[(int)$changed_socket]['joined']) {
@@ -65,11 +65,21 @@ while (true) {
                 }
             }
 
-            if (isset($tst_msg['message']) && $tst_msg['message']) {
+            if ($tst_msg['type'] == 'send-message') {
                 print_r('msg: '. $tst_msg['message'][0] .' '. $tst_msg['message'][1] . PHP_EOL);
                 $message = $tst_msg['message'];
-                $response = mask(json_encode(array('type' => 'usermsg', 'message' => $message)));
+                $response = mask(json_encode(array('type' => 'send-message', 'message' => $message)));
                 send_message_to_chat($chat_id, $response);
+            }
+
+            if ($tst_msg['type'] == 'edit-message') {
+                $response = mask(json_encode(array('type' => 'edit-message', 'message' => $tst_msg['message'])));
+                send_message_to_chat($tst_msg['chat_id'], $response);
+            }
+
+            if ($tst_msg['type'] == 'delete-message') {
+                $response = mask(json_encode(array('type' => 'delete-message', 'message' => $tst_msg['message'])));
+                send_message_to_chat($tst_msg['chat_id'], $response);
             }
 
             $end_time = microtime(true);

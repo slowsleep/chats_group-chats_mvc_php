@@ -89,8 +89,17 @@ if (messages) {
                                     })
                                     .then((data) => {
                                         if (data.status === 'success') {
-                                            curElem.querySelector(".message__content").innerText = chatForm.elements['content'].value;
-                                            curElem.querySelector(".message__footer").innerHTML = '<p>' + data.updated_at + '</p><p>(ред.)</p>';
+                                            let message = {
+                                                id: msgId,
+                                                content: chatForm.elements['content'].value,
+                                                updated_at: data.updated_at
+                                            };
+                                            const wsMsg = {
+                                                type: 'edit-message',
+                                                message,
+                                                chat_id: chatForm.elements['chat_id'].value
+                                            };
+                                            websocket.send(JSON.stringify(wsMsg));
                                         }
                                         updateCsrfToken(data.csrf_token);
                                         chatForm.elements['content'].value = '';
@@ -123,7 +132,15 @@ if (messages) {
                                     })
                                     .then((data) => {
                                         if (data.status === 'success') {
-                                            curElem.remove();
+                                            let message = {
+                                                id: msgId,
+                                            };
+                                            const wsMsg = {
+                                                type: 'delete-message',
+                                                message,
+                                                chat_id: chatForm.elements['chat_id'].value
+                                            };
+                                            websocket.send(JSON.stringify(wsMsg));
                                             updateCsrfToken(data.csrf_token);
                                         }
                                     })

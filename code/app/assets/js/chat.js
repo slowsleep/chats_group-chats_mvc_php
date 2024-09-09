@@ -8,14 +8,16 @@ if (chatForm) {
     chatForm.addEventListener('submit', sendMessage);
 
     if (window.location.search) {
-        let getUserId = window.location.search.split('?')[1].split('=')[1];
+        let getUserIdOrChatId = window.location.search.split('?')[1].split('=')[1];
+        console.log(getUserIdOrChatId);
 
-        if (getUserId) {
+        if (getUserIdOrChatId) {
             websocket = new WebSocket(wsUrl);
 
             websocket.onopen = function (event) {
                 messages.innerHTML += '<p>Соединение установлено</p>';
                 websocket.send(JSON.stringify({
+                    type: 'start',
                     chat_id
                 }));
             }
@@ -26,7 +28,7 @@ if (chatForm) {
                 const message = response.message;
 
                 switch (res_type) {
-                    case 'usermsg':
+                    case 'send-message':
                         let msgDiv = document.createElement('div');
                         msgDiv.setAttribute('data-msgid', message.id);
                         msgDiv.className = 'message ' + (message.user_id == user_id ? 'message--own' : '');
@@ -34,6 +36,12 @@ if (chatForm) {
                             '<div class="message__footer"><p>' + message.updated_at + '</p>';
                         if (message.created_at != message.updated_at) msgDiv.innerHTML += '<p>(ред.)</p></div>';
                         messages.appendChild(msgDiv);
+                        break;
+                    case 'edit-message':
+                        messages.querySelector('[data-msgid="' + message.id + '"]').innerHTML = '<p class="message__content">' + message.content + '</p>' + '<div class="message__footer"><p>' + message.updated_at + '</p><p>(ред.)</p></div>';
+                        break;
+                    case 'delete-message':
+                        messages.querySelector('[data-msgid="' + message.id + '"]').remove();
                         break;
                     case 'system':
                         let sysMsgDiv = document.createElement('div');
@@ -93,6 +101,7 @@ if (chatForm) {
                 if (data.status === 'success') {
                     message = data.message;
                     const wsMsg = {
+                        type: 'send-message',
                         message,
                         chat_id
                     };
