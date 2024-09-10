@@ -27,7 +27,9 @@
         </div>
         <?php include_once APP_DIR . '/views/layout/side-menu.php' ?>
     </main>
-    <?php include_once APP_DIR . '/views/layout/popup.php' ?>
+    <?php include_once APP_DIR . '/views/layout/modalCreateGroup.php' ?>
+    <script src="/app/assets/js/modal.js"></script>
+    <script src="/app/assets/js/searchContacts.js"></script>
     <script src="/app/assets/js/createGroup.js"></script>
 </body>
 
