@@ -185,7 +185,7 @@ input:hover {
     content: '';
 }
 
-.popup {
+.modal {
     top: 0;
     width: 100%;
     height: 100%;
@@ -196,19 +196,23 @@ input:hover {
     align-items: center;
 }
 
-.popup__content {
+.modal.active {
+    display: flex;
+}
+
+.modal__content {
     background-color: white;
     padding: 1em;
     border-radius: .5em;
 }
 
-.popup__content__users__list__item {
+.search-own-contacts__list__item {
     display: flex;
     flex-direction: row;
     justify-content: space-between
 }
 
-.popup__close {
+.modal-close {
     float: right;
 }
 
