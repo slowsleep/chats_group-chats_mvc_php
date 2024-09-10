@@ -47,7 +47,7 @@ class Chat extends Model {
     /**
      * Get user dialog with contact
      * @param array $data - associative array. keys - [user_id, contact_id]
-     * @return int|bool
+     * @return int|bool - chat_id
      */
     public static function getDialog($data)
     {
