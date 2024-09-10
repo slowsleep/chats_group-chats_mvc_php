@@ -57,13 +57,26 @@ function isOwnMessage($message)
         </div>
     </div>
 </div>
+
 <div class="message-menu">
     <ul>
         <li id="msg-edit">Редактировать</li>
         <li id="msg-delete">Удалить</li>
-        <li id="msg-forward">Переслать</li>
+        <li id="openForwardMessageModalBtn">Переслать</li>
     </ul>
 </div>
+
+<div class="modal" id="forwardMessageModal">
+    <div class="modal__content">
+        <button class="modal-close">х</button>
+        <div>
+            <h2>Переслать сообщение</h2>
+            <?php include APP_DIR . '/views/layout/searchContacts.php' ?>
+            <button id="msg-forward">Переслать</button>
+        </div>
+    </div>
+</div>
+
 <script>
     let messages = document.querySelector('#messages');
 </script>

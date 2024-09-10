@@ -1,11 +1,13 @@
 let msgMenu = document.querySelector(".message-menu");
 let msgEditBtn = msgMenu.querySelector("#msg-edit");
 let msgDeleteBtn = msgMenu.querySelector("#msg-delete");
-let msgForwardBtn = msgMenu.querySelector("#msg-forward");
+let msgOpenForwardBtn = msgMenu.querySelector("#openForwardMessageModalBtn");
 
 // Хранение ссылок на текущие обработчики манипулирования сообщением
 let currentEditHandler;
 let currentDeleteHandler;
+let currentForwardHandler;
+let forwardMsgHandler;
 
 if (messages) {
     // Вешаем событие на контейнер сообщений
@@ -40,6 +42,7 @@ if (messages) {
                         msgMenu.style.left = `${event.pageX}px`;
                         msgMenu.style.top = `${event.pageY}px`;
 
+                        // Редактирование
                         // Удаляем предыдущий обработчик
                         if (currentEditHandler) {
                             msgEditBtn.removeEventListener("click", currentEditHandler);
@@ -49,6 +52,7 @@ if (messages) {
                         currentEditHandler = handlerEditMessageBtn;
                         msgEditBtn.addEventListener("click", handlerEditMessageBtn);
 
+                        // Удаление
                         if (currentDeleteHandler) {
                             msgDeleteBtn.removeEventListener("click", currentDeleteHandler);
                         }
@@ -56,9 +60,16 @@ if (messages) {
                         currentDeleteHandler = deleteMessage;
                         msgDeleteBtn.addEventListener("click", deleteMessage);
 
+                        // Пересылка
+                        if (currentForwardHandler) {
+                            msgOpenForwardBtn.removeEventListener("click", currentForwardHandler);
+                        }
+
+                        currentForwardHandler = openForwardMessageModal;
+                        msgOpenForwardBtn.addEventListener("click", openForwardMessageModal);
+
                         function handlerEditMessageBtn(event) {
                             event.preventDefault();
-
                             let content = curElem.querySelector(".message__content").innerText;
                             chatForm.elements['content'].value = content;
                             // Удаляем предыдущий евент, чтобы сообщение не отправлялось
@@ -147,6 +158,72 @@ if (messages) {
                             }
                         }
 
+                        function openForwardMessageModal(event) {
+                            event.preventDefault();
+                            openModal("forwardMessageModal");
+                            let msgForwardBtn = document.querySelector("#msg-forward");
+
+                            if (forwardMsgHandler) {
+                                msgForwardBtn.removeEventListener("click", forwardMsgHandler);
+                            }
+
+                            forwardMsgHandler = forwardMessage;
+                            msgForwardBtn.addEventListener("click", forwardMessage);
+                        }
+
+                        function forwardMessage() {
+                            let userList = getSelectedUsers();
+
+                            let message = {
+                                id: msgId,
+                                chat_id: chatForm.elements['chat_id'].value,
+                                content: curElem.querySelector(".message__content").innerText,
+                                updated_at: curElem.querySelector(".message__footer").innerText
+                            }
+
+                            asyncForwardMessages(userList);
+                            closeModal("forwardMessageModal");
+
+                            async function asyncForwardMessages() {
+                                for (const user of userList) {
+                                    try {
+                                        const response = await fetch(`/api/message/forward`, {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json'
+                                            },
+                                            body: JSON.stringify({
+                                                message,
+                                                contact_id: user,
+                                                csrf_token: csrfToken.getAttribute('content')
+                                            })
+                                        });
+
+                                        if (!response.ok) {
+                                            throw new Error(`HTTP error! status: ${response.status}`);
+                                        }
+
+                                        const data = await response.json();
+
+                                        if (data.status === 'success') {
+                                            // TODO: Переслать сообщение через websocket
+                                            // const wsMsg = {
+                                            //     type: 'forward-message',
+                                            //     message,
+                                            //     chat_id: data.chat_id
+                                            // };
+                                            // websocket.send(JSON.stringify(wsMsg));
+                                        }
+
+                                        updateCsrfToken(data.csrf_token);
+
+                                    } catch (error) {
+                                        console.error('Ошибка при пересылке сообщения:', error);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
                     }
                 })
         }
