@@ -143,13 +143,17 @@ input:hover {
     margin: .1em;
 }
 
+.message__forwarded {
+    font-size: .8em;
+}
+
 .message--own {
     background-color: #bdd7c1;
     align-self: end;
 }
 
 .message__footer {
-    font-size: .9em;
+    font-size: .7em;
     color: #7a7a7a;
     margin-top: .5em;
     display: flex;
