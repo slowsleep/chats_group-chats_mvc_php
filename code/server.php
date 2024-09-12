@@ -25,13 +25,13 @@ while (true) {
         $header = socket_read($socket_new, 1024);
         perform_handshaking($header, $socket_new, $host, $port);
         socket_getpeername($socket_new, $ip);
-        echo "New connection from ".$ip.":".$port."\n";
+        echo "New connection from " . $ip . ":" . $port . "\n";
 
         // Инициализируем информацию о новом клиенте
-        $client_info[(int)$socket_new] = [
+        $client_info[spl_object_hash($socket_new)] = [
             'socket' => $socket_new,
             'joined' => false,
-            'chat_id' => null
+            'chat_id' => 0
         ];
 
         $found_socket = array_search($socket, $changed);
@@ -44,12 +44,13 @@ while (true) {
             $received_text = unmask($buf);
             $tst_msg = json_decode($received_text, true);
 
-            if ($tst_msg['type'] == 'start') {
+            if (isset($tst_msg['type']) && $tst_msg['type'] == 'start') {
+                print_r("start" . PHP_EOL);
                 $chat_id = $tst_msg['chat_id'];
 
-                if (!$client_info[(int)$changed_socket]['joined']) {
-                    $client_info[(int)$changed_socket]['joined'] = true;
-                    $client_info[(int)$changed_socket]['chat_id'] = $chat_id;
+                if (!$client_info[spl_object_hash($changed_socket)]['joined']) {
+                    $client_info[spl_object_hash($changed_socket)]['joined'] = true;
+                    $client_info[spl_object_hash($changed_socket)]['chat_id'] = $chat_id;
 
                     // Если пользователь еще не в комнате, добавляем его
                     if (!isset($chats[$chat_id])) {
@@ -59,25 +60,33 @@ while (true) {
                         $chats[$chat_id][] = $changed_socket;
                     }
 
-                    $response = mask(json_encode(array('type' => 'system', 'message' => $ip.' connected')));
+                    $response = mask(json_encode(array('type' => 'system', 'message' => $ip . ' connected')));
                     send_message_to_chat($chat_id, $response);
-                    echo 'User joined chat '.$chat_id."\n";
+                    echo 'User joined chat ' . $chat_id . "\n";
                 }
             }
 
-            if ($tst_msg['type'] == 'send-message') {
-                print_r('msg: '. $tst_msg['message'][0] .' '. $tst_msg['message'][1] . PHP_EOL);
-                $message = $tst_msg['message'];
-                $response = mask(json_encode(array('type' => 'send-message', 'message' => $message)));
-                send_message_to_chat($chat_id, $response);
+            if (isset($tst_msg['type']) && $tst_msg['type'] == 'ping') {
+                $response = mask(json_encode(array('type' => 'pong')));
+                socket_write($changed_socket, $response, strlen($response));
             }
 
-            if ($tst_msg['type'] == 'edit-message') {
+            if (isset($tst_msg['type']) && $tst_msg['type'] == 'send-message') {
+                print_r('send-message to ' . $tst_msg['chat_id'] . PHP_EOL);
+                print_r('msg: ' . $tst_msg['message'][0] . ' ' . $tst_msg['message'][1] . PHP_EOL);
+                $message = $tst_msg['message'];
+                $response = mask(json_encode(array('type' => 'send-message', 'message' => $message)));
+                send_message_to_chat($tst_msg['chat_id'], $response);
+            }
+
+            if (isset($tst_msg['type']) && $tst_msg['type'] == 'edit-message') {
+                print_r('edit-message' . PHP_EOL);
                 $response = mask(json_encode(array('type' => 'edit-message', 'message' => $tst_msg['message'])));
                 send_message_to_chat($tst_msg['chat_id'], $response);
             }
 
-            if ($tst_msg['type'] == 'delete-message') {
+            if (isset($tst_msg['type']) && $tst_msg['type'] == 'delete-message') {
+                print_r('delete-message' . PHP_EOL);
                 $response = mask(json_encode(array('type' => 'delete-message', 'message' => $tst_msg['message'])));
                 send_message_to_chat($tst_msg['chat_id'], $response);
             }
@@ -85,13 +94,14 @@ while (true) {
             $end_time = microtime(true);
             $execution_time = ($end_time - $start_time);
             echo "Время обработки сообщения: " . $execution_time . " секунд\n";
-
+            echo "-----------------------------\n\n";
             break 2;
         }
 
         $buf = @socket_read($changed_socket, 1024, PHP_NORMAL_READ);
 
         if ($buf === false) {
+            echo "buffer is false\n";
             $chat_id = null;
 
             // Удаляем пользователя из массива чатов
@@ -108,12 +118,11 @@ while (true) {
             $found_socket = array_search($changed_socket, $clients);
             socket_getpeername($changed_socket, $ip);
             unset($clients[$found_socket]);
-            unset($client_info[(int)$changed_socket]);
+            unset($client_info[spl_object_hash($changed_socket)]);
 
-            $response = mask(json_encode(array('type' => 'system', 'message' => $ip.' disconnected')));
+            $response = mask(json_encode(array('type' => 'system', 'message' => $ip . ' disconnected')));
             send_message_to_chat($chat_id, $response);
         }
-
     }
 }
 
@@ -191,7 +200,7 @@ function perform_handshaking($receved_header, $client_conn, $host, $port)
         "Upgrade: websocket\r\n" .
         "Connection: Upgrade\r\n" .
         "WebSocket-Origin: $host\r\n" .
-        "WebSocket-Location: ws://$host:$port/shout.php\r\n".
+        "WebSocket-Location: ws://$host:$port/server.php\r\n" .
         "Sec-WebSocket-Accept:$secAccept\r\n\r\n";
 
     socket_write($client_conn, $upgrade, strlen($upgrade));
