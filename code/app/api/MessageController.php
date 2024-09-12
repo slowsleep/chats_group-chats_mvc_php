@@ -80,7 +80,6 @@ class MessageController extends ApiController
 
         $errors = [];
         $messageId = $data['message']['id'];
-        $messageFromChat = $data['message']['chat_id'];
         $contactId = $data['contact_id'];
         $chatId = Chat::getDialog(['contact_id' => $contactId, 'user_id' => $_SESSION['user']['id']]);
 
@@ -95,17 +94,17 @@ class MessageController extends ApiController
                 $errors['chat'] = 'Не удалось создать чат';
             }
         }
-        
-        if ($messageFromChat == $chatId) {
-            $newMessage = Message::create(['chat_id' => $chatId, 'user_id' => $_SESSION['user']['id'], 'content' => $data['message']['content']]);
-            if (!$newMessage) {
-                $errors['message'] = 'Не удалось создать сообщение';
-            }
-        } else {
-            $isForward = Message::forward(['message_id' => $messageId, 'chat_id' => $chatId]);
-            if (!$isForward) {
-                $errors['message'] = 'Не удалось переслать сообщение';
-            }
+
+        $newMessageId = Message::forward(['message_id' => $messageId, 'chat_id' => $chatId]);
+
+        if (!$newMessageId) {
+            $errors['message'] = 'Не удалось переслать сообщение';
+        }
+
+        $newMessageData = Message::getMessage($newMessageId);
+
+        if (!$newMessageData) {
+            $errors['message'] = 'Не удалось получить сообщение';
         }
 
         refreshCsrfToken();
@@ -118,6 +117,10 @@ class MessageController extends ApiController
         } else {
             $response['status'] = 'success';
             $response['message'] = 'Сообщение переслано';
+            $response['data'] = [
+                'message' => $newMessageData,
+                'chat_id' => $chatId
+            ];
         }
 
         echo json_encode($response);
