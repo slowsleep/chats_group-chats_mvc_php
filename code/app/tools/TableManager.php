@@ -61,25 +61,18 @@ class TableManager
     {
         try {
             $db = DB::connect();
-
-            // $query = "CREATE TABLE IF NOT EXISTS messages (
-            //     id int(11) NOT NULL AUTO_INCREMENT,
-            //     content text NOT NULL,
-            //     user_id int(11) NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-            //     chat_id int(11) NOT NULL REFERENCES chats (id) ON DELETE CASCADE,
-            //     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            //     updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            //     PRIMARY KEY (id)
-            // )";
             $query = "CREATE TABLE IF NOT EXISTS messages (
                 id int(11) NOT NULL AUTO_INCREMENT,
                 content text NOT NULL,
                 user_id int(11) NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+                is_forwarded boolean DEFAULT FALSE,
+                original_message_id int NULL,
                 created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                PRIMARY KEY (id)
+                PRIMARY KEY (id),
+                FOREIGN KEY (original_message_id) REFERENCES messages(id)
             )";
-
+            
             $db->exec($query);
 
             echo "Table messages created successfully.<br>";
