@@ -91,6 +91,13 @@ while (true) {
                 send_message_to_chat($tst_msg['chat_id'], $response);
             }
 
+            if (isset($tst_msg['type']) && $tst_msg['type'] == 'close') {
+                echo "Received close message from client.\n";
+                $userLeaveChatId = deleteUser($changed_socket);
+                close_websocket_connection($changed_socket, 1000, 'Chat ' . $userLeaveChatId . ' is closed!');
+                echo "User disconnected from chat $userLeaveChatId.\n";
+            }
+
             $end_time = microtime(true);
             $execution_time = ($end_time - $start_time);
             echo "Время обработки сообщения: " . $execution_time . " секунд\n";
@@ -101,25 +108,10 @@ while (true) {
         $buf = @socket_read($changed_socket, 1024, PHP_NORMAL_READ);
 
         if ($buf === false) {
-            echo "buffer is false\n";
-            $chat_id = null;
-
-            // Удаляем пользователя из массива чатов
-            foreach ($chats as $chat => $sockets) {
-                if (($key = array_search($changed_socket, $sockets)) !== false) {
-                    $chat_id = $chat;
-                    unset($chats[$chat][$key]);
-                }
-            }
-
-            print_r('User disconnected from chat: ' . $chat_id  . PHP_EOL);
-
-            // Удаляем пользователя из массива клиентов и массива информации о клиентах
-            $found_socket = array_search($changed_socket, $clients);
+            echo "Buffer is false\n";
             socket_getpeername($changed_socket, $ip);
-            unset($clients[$found_socket]);
-            unset($client_info[spl_object_hash($changed_socket)]);
-
+            $chat_id = deleteUser($changed_socket);
+            close_websocket_connection($changed_socket, 1001, 'User disconnected');
             $response = mask(json_encode(array('type' => 'system', 'message' => $ip . ' disconnected')));
             send_message_to_chat($chat_id, $response);
         }
@@ -127,6 +119,29 @@ while (true) {
 }
 
 socket_close($socket);
+
+function deleteUser($changed_socket)
+{
+    global $clients;
+    global $chats;
+    global $client_info;
+
+    // Получаем ID чата откуда пользователь вышел
+    $chat_id = $client_info[spl_object_hash($changed_socket)]['chat_id'];
+
+    // Удаляем пользователя из списка чатов
+    $found_chat = array_search($changed_socket, $chats[$chat_id]);
+    unset($chats[$chat_id][$found_chat]);
+
+    // Убираем пользователя из списка клиентов
+    $found_socket = array_search($changed_socket, $clients);
+    unset($clients[$found_socket]);
+
+    // Удаляем информацию о клиенте
+    unset($client_info[spl_object_hash($changed_socket)]);
+
+    return $chat_id;
+}
 
 // Функция отправки сообщений всем участникам чата
 function send_message_to_chat($chat_id, $msg)
@@ -204,4 +219,18 @@ function perform_handshaking($receved_header, $client_conn, $host, $port)
         "Sec-WebSocket-Accept:$secAccept\r\n\r\n";
 
     socket_write($client_conn, $upgrade, strlen($upgrade));
+}
+
+function close_websocket_connection($client_conn, $code = 1000, $reason = '')
+{
+    $close_payload = pack('n', $code) . $reason;
+
+    // Формируем фрейм закрытия WebSocket (финальный фрейм, опкод 0x8 для закрытия)
+    $close_frame = chr(0x88) . chr(strlen($close_payload)) . $close_payload;
+
+    // Отправляем фрейм закрытия клиенту
+    socket_write($client_conn, $close_frame, strlen($close_frame));
+
+    // Закрываем сам TCP-сокет
+    socket_close($client_conn);
 }

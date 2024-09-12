@@ -72,6 +72,17 @@ if (chatForm) {
             websocket.onclose = function (event) {
                 messages.innerHTML += '<p>Соединение закрыто</p>';
             }
+
+            // Закрываем соединение, если пользователь ушел со страницы чата
+            window.addEventListener('beforeunload', function (event) {
+                event.preventDefault();
+
+                if (websocket.readyState === WebSocket.OPEN) {
+                    websocket.send(JSON.stringify({
+                        type: 'close'
+                    }));
+                }
+            });
         }
     }
 
