@@ -25,6 +25,7 @@ function isOwnMessage($message)
             <?php elseif (isset($_GET['id'])): ?>
                 <h3>Групповой чат <?= $_GET['id'] ?></h3>
             <?php endif; ?>
+            <?= 'chat_id: ' . $data['chat_id'] ?? '' ?>
 
             <div class="messages" id="messages">
                 <?php if (isset($data['messages']) && $data['messages']): ?>
@@ -33,6 +34,9 @@ function isOwnMessage($message)
                             class="message <?= isOwnMessage($message) ? 'message--own' : '' ?>"
                             data-msgid="<?= $message['id'] ?>"
                         >
+                            <?php if ($message['is_forwarded']): ?>
+                                <p class="message__forwarded">&#9166; Пересланное сообщение</p>
+                            <?php endif; ?>
                             <p class="message__content"><?= $message['content'] ?></p>
                             <div class="message__footer">
                                 <p><?= $message['updated_at'] ?></p>
