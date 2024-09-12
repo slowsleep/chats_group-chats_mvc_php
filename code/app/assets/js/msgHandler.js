@@ -50,7 +50,7 @@ if (messages) {
 
                         // Сохраняем текущий обработчик, чтобы его можно было удалить при следующем вызове
                         currentEditHandler = handlerEditMessageBtn;
-                        msgEditBtn.addEventListener("click", handlerEditMessageBtn);
+                        msgEditBtn.addEventListener("click", currentEditHandler);
 
                         // Удаление
                         if (currentDeleteHandler) {
@@ -58,7 +58,7 @@ if (messages) {
                         }
 
                         currentDeleteHandler = deleteMessage;
-                        msgDeleteBtn.addEventListener("click", deleteMessage);
+                        msgDeleteBtn.addEventListener("click", currentDeleteHandler);
 
                         // Пересылка
                         if (currentForwardHandler) {
@@ -66,7 +66,7 @@ if (messages) {
                         }
 
                         currentForwardHandler = openForwardMessageModal;
-                        msgOpenForwardBtn.addEventListener("click", openForwardMessageModal);
+                        msgOpenForwardBtn.addEventListener("click", currentForwardHandler);
 
                         function handlerEditMessageBtn(event) {
                             event.preventDefault();
@@ -168,7 +168,7 @@ if (messages) {
                             }
 
                             forwardMsgHandler = forwardMessage;
-                            msgForwardBtn.addEventListener("click", forwardMessage);
+                            msgForwardBtn.addEventListener("click", forwardMsgHandler);
                         }
 
                         function forwardMessage() {
@@ -206,13 +206,12 @@ if (messages) {
                                         const data = await response.json();
 
                                         if (data.status === 'success') {
-                                            // TODO: Переслать сообщение через websocket
-                                            // const wsMsg = {
-                                            //     type: 'forward-message',
-                                            //     message,
-                                            //     chat_id: data.chat_id
-                                            // };
-                                            // websocket.send(JSON.stringify(wsMsg));
+                                            const wsMsg = {
+                                                type: 'send-message',
+                                                message: data.data.message,
+                                                chat_id: data.data.chat_id
+                                            };
+                                            websocket.send(JSON.stringify(wsMsg));
                                         }
 
                                         updateCsrfToken(data.csrf_token);
