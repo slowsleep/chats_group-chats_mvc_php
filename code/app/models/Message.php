@@ -160,14 +160,28 @@ class Message extends Model {
     public static function forward($data)
     {
         try {
+            $oldMsg = Message::getMessage($data['message_id']);
             $db = DB::connect();
-            $query = 'INSERT INTO chat_messages (chat_id, message_id) VALUES (:chat_id, :message_id)';
+            $db->beginTransaction();
+            $query = 'INSERT INTO messages (content, user_id, is_forwarded, original_message_id) VALUES (:content, :user_id, 1, :original_message_id)';
             $stmt = $db->prepare($query);
-            $stmt->bindParam(':chat_id', $data['chat_id']);
-            $stmt->bindParam(':message_id', $data['message_id']);
+            $stmt->bindParam(':content', $oldMsg['content']);
+            $stmt->bindParam(':user_id', $oldMsg['user_id']);
+            $stmt->bindParam(':original_message_id', $data['message_id']);
             $stmt->execute();
             if ($stmt) {
-                return true;
+                $msgId = $db->lastInsertId();
+                $query = 'INSERT INTO chat_messages (chat_id, message_id) VALUES (:chat_id, :message_id)';
+                $stmt = $db->prepare($query);
+                $stmt->bindParam(':chat_id', $data['chat_id']);
+                $stmt->bindParam(':message_id', $msgId);
+                $stmt->execute();
+                if ($stmt) {
+                    $db->commit();
+                    return $msgId;
+                } else {
+                    $db->rollBack();
+                }
             }
         } catch (PDOException $e) {
             echo $e->getMessage();
