@@ -1,3 +1,6 @@
+// Очищаем список выбранных пользователей чтобы они не портили запросы
+clearSelectedUsers();
+
 // Обработка поиска контактов
 function handleSearchOwnContactsForm(modal) {
     let searchOwnContactsForm = modal.querySelector(".search-own-contacts-form");
