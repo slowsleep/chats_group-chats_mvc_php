@@ -1,6 +1,8 @@
 // let message from chat view
 const wsUrl = 'ws://webchat.local:3000/server.php';
 let chatForm = document.querySelector('#chat-form');
+let websocket;
+
 if (chatForm) {
     let chat_id = chatForm.elements['chat_id'].value;
     let user_id = chatForm.elements['user_id'].value;
@@ -19,6 +21,17 @@ if (chatForm) {
                     type: 'start',
                     chat_id
                 }));
+
+                // Отправляем пинги каждые 30 секунд
+                const pingInterval = setInterval(() => {
+                    if (websocket.readyState === WebSocket.OPEN) {
+                        websocket.send(JSON.stringify({
+                            type: 'ping'
+                        }));
+                    } else {
+                        clearInterval(pingInterval); // Останавливаем пинги, если соединение закрыто
+                    }
+                }, 30000);
             }
 
             websocket.onmessage = function (event) {
@@ -31,7 +44,8 @@ if (chatForm) {
                         let msgDiv = document.createElement('div');
                         msgDiv.setAttribute('data-msgid', message.id);
                         msgDiv.className = 'message ' + (message.user_id == user_id ? 'message--own' : '');
-                        msgDiv.innerHTML = '<p class="message__content">' + message.content + '</p>' +
+                        if (message.is_forwarded) msgDiv.innerHTML = '<p class="message__forwarded">&#9166; Пересланное сообщение</p>';
+                        msgDiv.innerHTML += '<p class="message__content">' + message.content + '</p>' +
                             '<div class="message__footer"><p>' + message.updated_at + '</p>';
                         if (message.created_at != message.updated_at) msgDiv.innerHTML += '<p>(ред.)</p></div>';
                         messages.appendChild(msgDiv);
