@@ -185,6 +185,10 @@ input:hover {
     height: 3em;
 }
 
+.form-chat > input[type="submit"]:disabled {
+    opacity: .5;
+}
+
 .form-chat > input[type="submit"]::before {
     content: '';
 }

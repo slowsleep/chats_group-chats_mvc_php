@@ -17,6 +17,8 @@ if (chatForm) {
 
             websocket.onopen = function (event) {
                 messages.innerHTML += '<p>Соединение установлено</p>';
+                console.log(chatForm.elements['send']);
+                chatForm.elements['send'].disabled = false;
                 websocket.send(JSON.stringify({
                     type: 'start',
                     chat_id

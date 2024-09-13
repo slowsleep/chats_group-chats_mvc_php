@@ -55,7 +55,7 @@ function isOwnMessage($message)
                 <input type="hidden" name="contact_id" value="<?= $data['contact']['id'] ?? '' ?>">
                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                 <input type="text" name="content" placeholder="Наберите Ваше сообщение здесь">
-                <input type="submit" value="">
+                <input type="submit" value="" name="send" disabled>
             </form>
             <?php endif; ?>
         </div>
