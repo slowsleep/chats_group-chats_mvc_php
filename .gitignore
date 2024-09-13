@@ -3,3 +3,4 @@
 /code/vendor/
 /code/app/uploads/*
 !/code/app/uploads/.gitkeep
+.DS_Store
