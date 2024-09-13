@@ -73,6 +73,7 @@ if (chatForm) {
 
             websocket.onclose = function (event) {
                 messages.innerHTML += '<p>Соединение закрыто</p>';
+                chatForm.elements['send'].disabled = true;
             }
 
             // Закрываем соединение, если пользователь ушел со страницы чата
