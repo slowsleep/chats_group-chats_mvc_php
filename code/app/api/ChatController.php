@@ -6,6 +6,7 @@ use App\Core\ApiController;
 use App\Models\Message;
 use App\Models\Chat;
 use function App\Tools\refreshCsrfToken;
+use App\Models\UserChatSettings;
 
 class ChatController extends ApiController
 {
@@ -77,4 +78,39 @@ class ChatController extends ApiController
         echo json_encode($response);
         exit;
     }
+
+    public function getSound()
+    {
+        parent::auth();
+        $chatId = $_GET['id'];
+
+        $chatSettings = UserChatSettings::get(['user_id' => $_SESSION['user']['id'], 'chat_id' => $chatId]);
+        $response['status'] = 'success';
+        $response['notifications_enabled'] = $chatSettings['notifications_enabled'];
+        echo json_encode($response);
+        exit;
+    }
+
+    public function setSound()
+    {
+        parent::auth();
+        $data = json_decode(file_get_contents('php://input'), true);
+        parent::csrf($data['csrf_token']);
+
+        $data['notifications_enabled'] = $data['notifications_enabled'] ? 1 : 0;
+        $soundUpdate = UserChatSettings::update([
+            'user_id' => $_SESSION['user']['id'],
+            'chat_id' => $data['chat_id'],
+            'notifications_enabled' => $data['notifications_enabled']
+        ]);
+
+        refreshCsrfToken();
+        $response['csrf_token'] = $_SESSION['csrf_token'];
+
+        $response['status'] = $soundUpdate ? 'success' : 'failed';
+
+        echo json_encode($response);
+        exit;
+    }
+
 }
