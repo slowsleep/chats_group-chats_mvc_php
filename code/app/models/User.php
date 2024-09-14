@@ -233,13 +233,17 @@ class User extends Model
     /**
      * Get user's chats
      * @param array $data - associative array. keys - [user_id, is_group]
-     * @return array|bool
+     * @return array|bool - array keys - [chat_id, notifications_enabled]
      */
     public static function getChats($data)
     {
         try {
             $db = DB::connect();
-            $query = 'SELECT chat_id FROM chat_members JOIN chats ON chat_members.chat_id = chats.id WHERE user_id = :user_id AND is_group = :is_group';
+            $query = 'SELECT chat_members.chat_id, user_chat_settings.notifications_enabled
+            FROM chat_members
+            JOIN user_chat_settings ON user_chat_settings.user_id = chat_members.user_id AND user_chat_settings.chat_id = chat_members.chat_id
+            JOIN chats ON chat_members.chat_id = chats.id
+            WHERE chat_members.user_id = :user_id AND is_group = :is_group';
             $stmt = $db->prepare($query);
             $stmt->bindParam(':user_id', $data['user_id']);
             $stmt->bindParam(':is_group', $data['is_group']);
