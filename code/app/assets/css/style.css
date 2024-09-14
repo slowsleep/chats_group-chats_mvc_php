@@ -43,20 +43,75 @@ a:visited {
 .chat-list__dialogs {
     height: 100%;
     padding: .5em;
+    overflow: auto;
 }
 
 .chat-list__groups {
     height: 100%;
     padding: 2em;
+    overflow: auto;
+}
+.chat-list__groups > ul {
+    list-style: none;
+}
+
+.chat-list__item {
+    color: #000;
+    padding: .5em;
+    border-radius: .2em;
+    margin-bottom: .5em;
+    overflow-x: auto;
+}
+
+.chat-list__dialogs__item {
+    background-color: rgba(196, 196, 219, .5);
+    border: .5px solid cornflowerblue;
+    display: flex;
+    justify-content: space-between;
+    align-content: center;
+    align-items: center;
+}
+
+.chat-list__dialogs__item > div {
+    display: flex;
+    align-items: center;
+}
+
+.chat-list__dialogs__item > div:nth-child(1) {
+    gap: .5em;
+}
+
+.chat-list__groups__item {
+    background-color: rgba(203, 219, 196, 0.5);
+    border: .5px solid rgb(62, 124, 51);
+    display: flex;
+    justify-content: space-between;
+}
+
+.chat-menu-sound {
+    display: none;
+    background-color: whitesmoke;
+    position: absolute;
+    border: 1px solid #5f5f5f;
+}
+
+.chat-menu-sound > p {
+    padding: .5em;
+    cursor: pointer;
+}
+.chat-menu-sound > p:hover {
+    background-color: rgba(167, 177, 195, 0.425);
 }
 
 .content {
     width: 300%;
+    overflow: auto;
 }
 
 .side-menu {
     width: 100%;
     padding: 1em;
+    overflow: auto;
 }
 
 .side-menu__list {
@@ -250,4 +305,9 @@ input:hover {
 
 .message-menu > ul > li:hover {
     background-color: #c9c9c9;
+}
+
+.settings-change-msg-sound {
+    margin: 2em 1em;
+    padding: .5em;
 }
