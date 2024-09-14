@@ -1,5 +1,12 @@
 <?php
 
+require_once __DIR__ . '/vendor/autoload.php';
+require_once 'app/config/config.php';
+
+use App\Database\DB;
+
+$db = DB::connect();
+
 $host = 'localhost';
 $port = '3000';
 $null = NULL;
@@ -14,6 +21,7 @@ socket_listen($socket);
 $clients = array($socket);
 $chats = []; // Массив с чатами и пользователями внутри
 $client_info = []; // Массив для хранения информации о подключённых клиентах
+$notification_sockets = [];
 
 while (true) {
     $changed = $clients;
@@ -31,7 +39,8 @@ while (true) {
         $client_info[spl_object_hash($socket_new)] = [
             'socket' => $socket_new,
             'joined' => false,
-            'chat_id' => 0
+            'chat_id' => 0,
+            'user_id' => 0,
         ];
 
         $found_socket = array_search($socket, $changed);
@@ -66,6 +75,13 @@ while (true) {
                 }
             }
 
+            if (isset($tst_msg['type']) && $tst_msg['type'] == 'start-notification') {
+                $user_id = $tst_msg['user_id'];
+                $notification_sockets[$user_id] = $changed_socket;
+                $client_info[spl_object_hash($changed_socket)]['user_id'] = $user_id;
+                echo 'start-notification user:' . $user_id . PHP_EOL;
+            }
+
             if (isset($tst_msg['type']) && $tst_msg['type'] == 'ping') {
                 $response = mask(json_encode(array('type' => 'pong')));
                 socket_write($changed_socket, $response, strlen($response));
@@ -77,6 +93,13 @@ while (true) {
                 $message = $tst_msg['message'];
                 $response = mask(json_encode(array('type' => 'send-message', 'message' => $message)));
                 send_message_to_chat($tst_msg['chat_id'], $response);
+                $users_to_notify = get_users_to_notify($tst_msg['chat_id']);
+
+                foreach ($users_to_notify as $user_id) {
+                    if ($tst_msg['message']['user_id'] != $user_id) {
+                        send_notification_to_user($user_id);
+                    }
+                }
             }
 
             if (isset($tst_msg['type']) && $tst_msg['type'] == 'edit-message') {
@@ -93,9 +116,7 @@ while (true) {
 
             if (isset($tst_msg['type']) && $tst_msg['type'] == 'close') {
                 echo "Received close message from client.\n";
-                $userLeaveChatId = deleteUser($changed_socket);
-                close_websocket_connection($changed_socket, 1000, 'Chat ' . $userLeaveChatId . ' is closed!');
-                echo "User disconnected from chat $userLeaveChatId.\n";
+                handleDisconnect($changed_socket, 'Chat closed!');
             }
 
             $end_time = microtime(true);
@@ -109,38 +130,56 @@ while (true) {
 
         if ($buf === false) {
             echo "Buffer is false\n";
-            socket_getpeername($changed_socket, $ip);
-            $chat_id = deleteUser($changed_socket);
-            close_websocket_connection($changed_socket, 1001, 'User disconnected');
-            $response = mask(json_encode(array('type' => 'system', 'message' => $ip . ' disconnected')));
-            send_message_to_chat($chat_id, $response);
+            handleDisconnect($changed_socket, 'User disconnected');
         }
     }
 }
 
 socket_close($socket);
 
-function deleteUser($changed_socket)
-{
-    global $clients;
-    global $chats;
-    global $client_info;
 
-    // Получаем ID чата откуда пользователь вышел
-    $chat_id = $client_info[spl_object_hash($changed_socket)]['chat_id'];
+function handleDisconnect($socket, $reason) {
+    global $clients, $client_info, $chats, $notification_sockets;
 
-    // Удаляем пользователя из списка чатов
-    $found_chat = array_search($changed_socket, $chats[$chat_id]);
-    unset($chats[$chat_id][$found_chat]);
+    $chat_id = deleteUser($socket);
+    if ($chat_id) {
+        echo "User disconnected from chat $chat_id.\n";
+        send_message_to_chat($chat_id, mask(json_encode([
+            'type' => 'system',
+            'message' => socket_getpeername($socket, $ip) ? "$ip disconnected" : 'User disconnected'
+        ])));
+    }
 
-    // Убираем пользователя из списка клиентов
-    $found_socket = array_search($changed_socket, $clients);
-    unset($clients[$found_socket]);
+    $clientsFound = array_search($socket, $clients);
+    if ($clientsFound !== false) {
+        unset($clients[$clientsFound]);
+        unset($client_info[spl_object_hash($socket)]);
+    }
 
-    // Удаляем информацию о клиенте
-    unset($client_info[spl_object_hash($changed_socket)]);
+    foreach ($notification_sockets as $user_id => $notif_socket) {
+        if ($socket == $notif_socket) {
+            unset($notification_sockets[$user_id]);
+        }
+    }
 
-    return $chat_id;
+    close_websocket_connection($socket, 1001, $reason);
+}
+
+function deleteUser($socket) {
+    global $clients, $chats, $client_info;
+
+    try {
+        $chat_id = $client_info[spl_object_hash($socket)]['chat_id'] ?? null;
+        if ($chat_id && isset($chats[$chat_id])) {
+            $found_chat = array_search($socket, $chats[$chat_id]);
+            if ($found_chat !== false) unset($chats[$chat_id][$found_chat]);
+        }
+        unset($clients[array_search($socket, $clients)], $client_info[spl_object_hash($socket)]);
+        return $chat_id;
+    } catch (Exception $e) {
+        echo $e->getMessage() . PHP_EOL;
+    }
+    return false;
 }
 
 // Функция отправки сообщений всем участникам чата
@@ -153,6 +192,25 @@ function send_message_to_chat($chat_id, $msg)
         }
     }
     return true;
+}
+
+function get_users_to_notify($chat_id)
+{
+    global $db;
+    $query = $db->prepare("SELECT user_id FROM user_chat_settings WHERE chat_id = ? AND notifications_enabled = 1");
+    $query->execute([$chat_id]);
+    $users_with_notifications = $query->fetchAll(PDO::FETCH_COLUMN);
+    return $users_with_notifications;
+}
+
+function send_notification_to_user($user_id)
+{
+    global $notification_sockets;
+    if (isset($notification_sockets[$user_id])) {
+        echo 'send_notification_to_user: ' . $user_id . PHP_EOL;
+        $response = mask(json_encode(array('type' => 'notification')));
+        @socket_write($notification_sockets[$user_id], $response, strlen($response));
+    }
 }
 
 function mask($text)
