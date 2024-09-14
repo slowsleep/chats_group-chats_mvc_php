@@ -10,7 +10,7 @@
     <div class="form__row">
         <label for="avatar">Аватар:</label>
         <div class="form__row__avatar">
-            <img src="<?= $_SESSION['user']['avatar'] ? '/app/uploads/' . $_SESSION['user']['avatar'] : '/app/assets/img/avatar.png' ?>" alt="Avatar" id="avatar-img">
+            <img src="<?= $_SESSION['user']['avatar'] ? '/app/uploads/' . $_SESSION['user']['avatar'] : '/app/assets/img/avatar.png' ?>" alt="Avatar" id="avatar-img" width="200">
             <input type="file" name="avatar" id="avatar">
             <div class="form__row__avatar__del">
                 <label for="del-avatar">Удалить аватар:</label>
@@ -27,6 +27,22 @@
     <input type="submit" value="Сохранить">
 </form>
 
+<fieldset class="settings-change-msg-sound">
+    <legend>Настройки чатов</legend>
+    <form action="" id="msg-sound-form">
+        <label for="msg-sound">Звук уведомления</label>
+        <select name="msg-sound" id="msg-sound">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+        </select>
+    </form>
+</fieldset>
+
 <?php if (!empty($data['message'])) echo $data['message']; ?>
 
 <script src="/app/assets/js/checkSettingsFields.js"></script>
+<script src="/app/assets/js/msgSoundSettings.js"></script>
