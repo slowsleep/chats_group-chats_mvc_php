@@ -72,7 +72,7 @@ class TableManager
                 PRIMARY KEY (id),
                 FOREIGN KEY (original_message_id) REFERENCES messages(id)
             )";
-            
+
             $db->exec($query);
 
             echo "Table messages created successfully.<br>";
@@ -138,14 +138,23 @@ class TableManager
         }
     }
 
-    public function createAllTables()
+    public function createUserChatSettingsTable()
     {
-        $this->createTableUsers();
-        $this->createTableChats();
-        $this->createTableMessages();
-        $this->createTableChatMembers();
-        $this->createTableChatMessages();
-        $this->createTableSubscriptions();
+        try {
+            $db = DB::connect();
+            $query = "CREATE TABLE IF NOT EXISTS user_chat_settings (
+                id int(11) PRIMARY KEY AUTO_INCREMENT,
+                user_id int(11) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                chat_id int(11) NOT NULL REFERENCES chats(id) ON DELETE CASCADE,
+                notifications_enabled boolean DEFAULT TRUE,
+                created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+                updated_at timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            )";
+            $db->exec($query);
+            echo "Table user_chat_settings created successfully.<br>";
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
     }
 
     public function createTableIfNotExists($table, $isExists)
@@ -156,7 +165,8 @@ class TableManager
             'messages' => 'createTableMessages',
             'chat_members' => 'createTableChatMembers',
             'chat_messages' => 'createTableChatMessages',
-            'subscriptions' => 'createTableSubscriptions'
+            'subscriptions' => 'createTableSubscriptions',
+            'user_chat_settings' => 'createUserChatSettingsTable'
         ];
 
         if (!$isExists) {
@@ -173,7 +183,7 @@ class TableManager
             $tables = array_map(function ($table) {
                 return $table->Tables_in_myapp;
             }, $tables);
-            $myTables = ['users', 'chats', 'messages', 'chat_members', 'chat_messages', 'subscriptions'];
+            $myTables = ['users', 'chats', 'messages', 'chat_members', 'chat_messages', 'subscriptions', 'user_chat_settings'];
             $isAllTablesExists = true;
             $isExistTable = [];
 
@@ -187,5 +197,4 @@ class TableManager
             echo $e->getMessage();
         }
     }
-
 }
