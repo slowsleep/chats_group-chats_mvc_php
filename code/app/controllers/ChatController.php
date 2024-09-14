@@ -133,7 +133,11 @@ class ChatController extends Controller
         if ($usersChats) {
             foreach ($usersChats as $chatId) {
                 $chatMembers = Chat::getMembers($chatId['chat_id']);
-                $chats[] = ['chat_id' => $chatId['chat_id'], 'members' => $chatMembers];
+                $chats[] = [
+                    'chat_id' => $chatId['chat_id'],
+                    'notifications_enabled' => $chatId['notifications_enabled'] ,
+                    'members' => $chatMembers
+                ];
             }
 
             foreach ($chats as $chat) {
@@ -143,6 +147,7 @@ class ChatController extends Controller
                         $chatsWithNames[] = [
                             'id' => $chat['chat_id'],
                             'user_id' => $memberInfo['id'],
+                            'notifications_enabled' => $chat['notifications_enabled'],
                             'title' => $memberInfo['username'] != '' ? $memberInfo['username'] : $memberInfo['email'],
                             'avatar' => $memberInfo['avatar'],
                         ];
