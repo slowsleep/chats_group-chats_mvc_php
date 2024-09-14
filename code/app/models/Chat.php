@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Core\Model;
 use App\Database\DB;
 use PDOException;
+use App\Models\UserChatSettings;
 
 class Chat extends Model {
     /**
@@ -30,8 +31,15 @@ class Chat extends Model {
                 $stmt->bindParam(':is_admin', $data['is_admin']);
                 $stmt->execute();
                 if ($stmt) {
-                    $db->commit();
-                    return $chatId;
+                    $addNotification = UserChatSettings::create([
+                        'user_id' => $data['user_id'],
+                        'chat_id' => $chatId,
+                        'notifications_enabled' => 1
+                    ]);
+                    if ($addNotification) {
+                        $db->commit();
+                        return $chatId;
+                    }
                 } else {
                     $db->rollBack();
                 }
@@ -127,7 +135,14 @@ class Chat extends Model {
             $stmt->bindParam(':chat_id', $data['chat_id']);
             $stmt->execute();
             if ($stmt) {
-                return true;
+                $addNotification = UserChatSettings::create([
+                    'user_id' => $data['user_id'],
+                    'chat_id' => $data['chat_id'],
+                    'notifications_enabled' => 1
+                ]);
+                if ($addNotification) {
+                    return true;
+                }
             }
         } catch (PDOException $e) {
             echo $e->getMessage();
