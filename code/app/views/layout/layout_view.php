@@ -16,6 +16,7 @@
                 input.value = newToken;
             });
         }
+        const wsUrl = 'ws://webchat.local:3000/server.php';
     </script>
     <title><?php echo $title; ?></title>
 </head>
@@ -31,6 +32,12 @@
     <script src="/app/assets/js/modal.js"></script>
     <script src="/app/assets/js/searchContacts.js"></script>
     <script src="/app/assets/js/createGroup.js"></script>
+    <?php if (isset($_SESSION['user'])) : ?>
+        <script>
+            let curUserId = <?php echo json_encode($_SESSION['user']['id']); ?>;
+        </script>
+        <script src="/app/assets/js/wsNotification.js"></script>
+    <?php endif; ?>
 </body>
 
 </html>

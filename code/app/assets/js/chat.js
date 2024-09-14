@@ -1,5 +1,5 @@
 // let message from chat view
-const wsUrl = 'ws://webchat.local:3000/server.php';
+// wsUrl from script layout_view.php
 let chatForm = document.querySelector('#chat-form');
 let websocket;
 
@@ -130,7 +130,7 @@ if (chatForm) {
                     const wsMsg = {
                         type: 'send-message',
                         message,
-                        chat_id
+                        chat_id,
                     };
                     websocket.send(JSON.stringify(wsMsg));
                 } else {
