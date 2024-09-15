@@ -28,6 +28,23 @@ a:visited {
     color: inherit;
 }
 
+.main-content {
+    padding: 1em;
+}
+
+.notFound {
+    margin: auto;
+    text-align: center;
+}
+
+.contacts__list {
+    list-style: none;
+}
+
+.contacts__list__item {
+    padding: .5em;
+}
+
 .chat-page {
     display: flex;
     height: 100%;
