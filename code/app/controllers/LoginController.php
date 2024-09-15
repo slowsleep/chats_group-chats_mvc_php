@@ -32,10 +32,10 @@ class LoginController extends Controller
         $user = User::login($_POST['email'], $_POST['password']);
 
         refreshCsrfToken();
-        
+
         if ($user) {
             $_SESSION['user'] = $user;
-            header('Location: /home');
+            header('Location: /chat');
         } else {
             $this->view->render(['content_view' => 'login_view.php', 'data' => ['message' => 'Неверные данные']]);
         }
