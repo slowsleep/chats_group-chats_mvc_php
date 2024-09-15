@@ -16,8 +16,9 @@ if (chatForm) {
             websocket = new WebSocket(wsUrl);
 
             websocket.onopen = function (event) {
-                messages.innerHTML += '<p>Соединение установлено</p>';
-                console.log(chatForm.elements['send']);
+                let output = document.createElement('p');
+                output.textContent = 'Подключение установлено';
+                messages.appendChild(output);
                 chatForm.elements['send'].disabled = false;
                 websocket.send(JSON.stringify({
                     type: 'start',
@@ -46,14 +47,51 @@ if (chatForm) {
                         let msgDiv = document.createElement('div');
                         msgDiv.setAttribute('data-msgid', message.id);
                         msgDiv.className = 'message ' + (message.user_id == user_id ? 'message--own' : '');
-                        if (message.is_forwarded) msgDiv.innerHTML = '<p class="message__forwarded">&#9166; Пересланное сообщение</p>';
-                        msgDiv.innerHTML += '<p class="message__content">' + message.content + '</p>' +
-                            '<div class="message__footer"><p>' + message.updated_at + '</p>';
-                        if (message.created_at != message.updated_at) msgDiv.innerHTML += '<p>(ред.)</p></div>';
+
+                        if (message.is_forwarded) {
+                            let msgForwarded = document.createElement('p');
+                            msgForwarded.className = 'message__forwarded';
+                            msgForwarded.innerText = 'Пересланное сообщение';
+                            msgDiv.appendChild(msgForwarded);
+                        }
+
+                        let msgContent = document.createElement('p');
+                        msgContent.className = 'message__content';
+                        msgContent.innerText = message.content;
+                        msgDiv.appendChild(msgContent);
+
+                        let msgFooter = document.createElement('div');
+                        msgFooter.className = 'message__footer';
+                        let msgFooterTime = document.createElement('p');
+                        msgFooterTime.innerText = message.updated_at;
+                        msgFooter.appendChild(msgFooterTime);
+
+                        if (message.created_at != message.updated_at) {
+                            let msgFooterRedact = document.createElement('p');
+                            msgFooterRedact.innerText = '(ред.)';
+                            msgFooter.appendChild(msgFooterRedact);
+                        }
+
+                        msgDiv.appendChild(msgFooter);
                         messages.appendChild(msgDiv);
                         break;
                     case 'edit-message':
-                        messages.querySelector('[data-msgid="' + message.id + '"]').innerHTML = '<p class="message__content">' + message.content + '</p>' + '<div class="message__footer"><p>' + message.updated_at + '</p><p>(ред.)</p></div>';
+                        let findMsg = messages.querySelector('[data-msgid="' + message.id + '"]');
+                        findMsg.innerHTML = "";
+                        let editedMsgContent = document.createElement('p');
+                        editedMsgContent.className = 'message__content';
+                        editedMsgContent.innerText = message.content;
+                        findMsg.appendChild(editedMsgContent);
+
+                        let editedMsgFooter = document.createElement('div');
+                        editedMsgFooter.className = 'message__footer';
+                        let editedMsgFooterTime = document.createElement('p');
+                        editedMsgFooterTime.innerText = message.updated_at;
+                        editedMsgFooter.appendChild(editedMsgFooterTime);
+                        let editedMsgFooterRedact = document.createElement('p');
+                        editedMsgFooterRedact.innerText = '(ред.)';
+                        editedMsgFooter.appendChild(editedMsgFooterRedact);
+                        findMsg.appendChild(editedMsgFooter);
                         break;
                     case 'delete-message':
                         messages.querySelector('[data-msgid="' + message.id + '"]').remove();
@@ -68,11 +106,15 @@ if (chatForm) {
 
             websocket.onerror = function (event) {
                 console.error('Websocket error: ' + event);
-                messages.innerHTML += '<p>Произошла ошибка: ' + event.data + '</p>';
+                let output = document.createElement('p');
+                output.textContent = 'Произошла ошибка: ' + event.data;
+                messages.appendChild(output);
             }
 
             websocket.onclose = function (event) {
-                messages.innerHTML += '<p>Соединение закрыто</p>';
+                let output = document.createElement('p');
+                output.textContent = 'Соединение закрыто';
+                messages.appendChild(output);
                 chatForm.elements['send'].disabled = true;
             }
 

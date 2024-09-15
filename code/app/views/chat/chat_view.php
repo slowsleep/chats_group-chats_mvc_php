@@ -6,7 +6,7 @@ function isOwnMessage($message)
 ?>
 <div class="chat-page">
     <?php include_once APP_DIR . '/views/chat/chat-list.php' ?>
-    <div class="chat">
+    <div class="chat main-content">
 
         <?php if (!isset($_GET['user']) && (!isset($_GET['id'])) || (isset($data['errors']) && $data['errors'])): ?>
             <div>
@@ -37,7 +37,7 @@ function isOwnMessage($message)
                             <?php if ($message['is_forwarded']): ?>
                                 <p class="message__forwarded">&#9166; Пересланное сообщение</p>
                             <?php endif; ?>
-                            <p class="message__content"><?= $message['content'] ?></p>
+                            <p class="message__content"><?= htmlspecialchars($message['content'], ENT_QUOTES, 'UTF-8'); ?></p>
                             <div class="message__footer">
                                 <p><?= $message['updated_at'] ?></p>
                                 <?php if ($message['created_at'] != $message['updated_at']): ?>

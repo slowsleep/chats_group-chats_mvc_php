@@ -78,19 +78,21 @@ function getUserContacts(modal) {
 function createUserElement(username, id) {
     let user = document.createElement('li');
     user.className = "search-own-contacts__list__item";
-    user.innerHTML = `<p>${username}</p>`;
+    let userTitle = document.createElement('p');
+    userTitle.innerText = username;
+    user.appendChild(userTitle);
     user.setAttribute("data-user-id", id);
 
     let btnWrapper = document.createElement('div');
     let addBtn = document.createElement('button');
     addBtn.className = "add-user";
-    addBtn.innerHTML = "+";
+    addBtn.innerText = "+";
     addBtn.addEventListener("click", addUser);
     btnWrapper.appendChild(addBtn);
 
     let remBtn = document.createElement('button');
     remBtn.className = "remove-user";
-    remBtn.innerHTML = "-";
+    remBtn.innerText = "-";
     remBtn.addEventListener("click", removeUser);
     btnWrapper.appendChild(remBtn);
     user.appendChild(btnWrapper);
